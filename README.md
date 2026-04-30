@@ -26,7 +26,7 @@ https://voyage-zolve.vercel.app
 ## Setup
 ```bash
 npm install
-## ANTHROPIC_API_KEY: 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
+## ANTHROPIC_API_KEY: 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
 npm run dev
 ```
 
