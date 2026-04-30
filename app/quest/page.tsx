@@ -109,9 +109,9 @@ export default function QuestPage() {
                     <span style={{ fontSize: 11, fontWeight: 700, color: "#c5a3ff", background: "rgba(168,85,247,0.12)", padding: "2px 8px", borderRadius: 999 }}>+{q.xp} XP</span>
                   </div>
                   <div style={{ fontSize: 14, fontWeight: 600, color: "#f0e6ff", marginBottom: 10 }}>{q.title}</div>
-                  {q.progress > 0 && (
+                  {(q.progress ?? 0) > 0 && (
                     <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,0.06)", overflow: "hidden", marginBottom: 10 }}>
-                      <motion.div initial={{ width: 0 }} animate={{ width: `${q.progress * 100}%` }} transition={{ duration: 0.8 }}
+                      <motion.div initial={{ width: 0 }} animate={{ width: `${(q.progress ?? 0) * 100}%` }} transition={{ duration: 0.8 }}
                         style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg,#a855f7,#e879f9)" }} />
                     </div>
                   )}

@@ -1,50 +1,72 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { BUDDY_SYSTEM_PROMPT, buildUserContext } from "@/lib/prompts";
-import { user, transactions } from "@/lib/world";
+import { NextRequest } from "next/server";
+import { z } from "zod";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+import { BUDDY_SYSTEM_PROMPT, buildUserContext } from "@/lib/prompts";
+import { getDiningSpike, getRecentTransactions, user } from "@/lib/world";
 
 export const runtime = "nodejs";
 
-export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-    const messages = body.messages as { role: "user" | "assistant"; content: string }[];
+const BodySchema = z.object({
+  messages: z.array(
+    z.object({
+      role: z.union([z.literal("user"), z.literal("assistant")]),
+      content: z.string(),
+    }),
+  ),
+});
 
-    const context = buildUserContext(
-      user.name,
-      user.creditScore,
-      user.currentUtilization,
-      transactions
-    );
+export async function POST(req: NextRequest) {
+  const encoder = new TextEncoder();
 
-    const stream = await client.messages.stream({
-      model: "claude-sonnet-4-5",
-      max_tokens: 300,
-      system: `${BUDDY_SYSTEM_PROMPT}\n\n${context}`,
-      messages,
-    });
+  const readableStream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const pushEvent = (payload: object) => {
+        controller.enqueue(
+          encoder.encode(`data: ${JSON.stringify(payload)}\n\n`),
+        );
+      };
 
-    const encoder = new TextEncoder();
-    const readable = new ReadableStream({
-      async start(controller) {
+      try {
+        const body = BodySchema.parse(await req.json());
+        const today = new Date().toISOString().split("T")[0];
+        const system =
+          BUDDY_SYSTEM_PROMPT +
+          "\n\n" +
+          buildUserContext(user, getRecentTransactions(10), getDiningSpike(), today);
+
+        const client = new Anthropic({
+          apiKey: process.env.ANTHROPIC_API_KEY,
+        });
+
+        const stream = client.messages.stream({
+          model: "claude-sonnet-4-5",
+          max_tokens: 600,
+          system,
+          messages: body.messages,
+        });
+
         for await (const event of stream) {
-          if (
-            event.type === "content_block_delta" &&
-            event.delta.type === "text_delta"
-          ) {
-            controller.enqueue(encoder.encode(event.delta.text));
+          if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+            pushEvent({ type: "text", delta: event.delta.text });
           }
         }
-        controller.close();
-      },
-    });
 
-    return new Response(readable, {
-      headers: { "Content-Type": "text/plain; charset=utf-8" },
-    });
-  } catch (err) {
-    console.error("Buddy API error:", err);
-    return new Response("Buddy hit a snag. Try again.", { status: 500 });
-  }
+        pushEvent({ type: "done" });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unknown error";
+        pushEvent({ type: "error", message });
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(readableStream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
+  });
 }
