@@ -295,7 +295,7 @@ export default function VoyageHome() {
   }, []);
 
   const displayUser = userData ?? { name: "Rishi", daysInUS: 87, stage: "Finding My Footing", creditScore: 642 };
-  const displayCohort = cohortData ?? { cohortName: cohort.name ?? "UTD Global Freshmen '28", subtitle: cohort.subtitle ?? "Class of '28", size: cohort.size, userPercentiles: cohort.userPercentiles };
+  const displayCohort = cohortData ?? { cohortName: "UTD Global Freshmen '28", subtitle: "Class of '28", size: 52, userPercentiles: { creditUtil: 62, savingsRate: 30, onTimePayments: 88, creditScore: 40 } };
   const fee = 2.99;
   const sendAmountNum = parseFloat(sendAmount) || 0;
   const recipientAmount = ((sendAmountNum - fee) * selectedCountry.rate).toFixed(0);
@@ -319,7 +319,7 @@ export default function VoyageHome() {
         </div>
         <button className="w-10 h-10 rounded-full flex items-center justify-center"
           style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.25),rgba(232,121,249,0.12))", border: "1px solid rgba(168,85,247,0.4)" }}>
-          <span style={{ fontSize: 14, fontWeight: 700, color: "#f0e6ff" }}>{displayUser.name?.[0] ?? "R"}</span>
+          <span style={{ fontSize: 14, fontWeight: 700, color: "#f0e6ff" }}>R</span>
         </button>
       </motion.header>
 
@@ -368,7 +368,7 @@ export default function VoyageHome() {
                   <span style={{ fontSize: 9, padding: "2px 7px", borderRadius: 999, background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.22)", color: "#c5a3ff", fontWeight: 500 }}>just now</span>
                 </div>
                 <p style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 15, lineHeight: 1.4, color: "#f0e6ff", marginBottom: 14 }}>
-                  &ldquo;{displayUser.name} — your utilization is at 62%. That&rsquo;s the #1 thing hurting your score right now. Want me to walk you through fixing it this week?&rdquo;
+                  &ldquo;Rishi — your utilization is at 62%. That&rsquo;s the #1 thing hurting your score right now. Want me to walk you through fixing it this week?&rdquo;
                 </p>
                 <div className="flex gap-2">
                   <button
