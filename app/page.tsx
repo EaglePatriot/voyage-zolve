@@ -374,8 +374,8 @@ export default function VoyageHome() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => openPanel("buddy", "my credit utilization is at 62% and i know thats bad — what are the fastest ways to bring it down this week?")}
-                    className="breathing-glow transition-all duration-300 hover:scale-105 active:scale-95"
-                    style={{ padding: "8px 16px", borderRadius: 999, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 12, fontWeight: 600 }}>
+                    className="transition-all duration-300 hover:scale-105 active:scale-95"
+                    style={{ padding: "8px 16px", borderRadius: 999, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 12, fontWeight: 600, animation: "breathingGlow 3s ease-in-out infinite" }}>
                     Walk me through
                   </button>
                   <button onClick={() => showToast("We'll remind you tomorrow")}
@@ -473,7 +473,9 @@ export default function VoyageHome() {
           <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
             {transactions.length > 0 ? transactions.map((tx, i) => (
               <div key={tx.id} className="flex items-center justify-between px-4 py-3"
-                style={{ borderBottom: i < transactions.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(168,85,247,0.2)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                style={{ borderBottom: i < transactions.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", transition: "transform 200ms ease, box-shadow 200ms ease" }}>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 500, color: "#f0e6ff" }}>{tx.merchant}</div>
                   <div style={{ fontSize: 11, color: "#7a6e8e", fontWeight: 500 }}>{tx.date}</div>

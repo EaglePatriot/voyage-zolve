@@ -161,6 +161,9 @@ export function BuddySheet({
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(168,85,247,0.2)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                  style={{ transition: "transform 200ms ease, box-shadow 200ms ease" }}
                   className={
                     m.role === "user"
                       ? "ml-auto max-w-[80%] bg-[var(--color-teal-deep)] text-stone-100 rounded-2xl rounded-tr-sm px-4 py-2 text-sm"

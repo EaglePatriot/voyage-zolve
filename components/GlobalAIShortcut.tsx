@@ -49,21 +49,6 @@ const CONTEXT_DATA: { [key: string]: ContextEntry } = {
   },
 };
 
-const MOCK_RESPONSES: { [key: string]: string } = {
-  "How do I fix my 62% utilization?": "Pay down your balance to under $150 — that gets you under 30% on your $500 limit. Even paying $50 extra this week moves the needle. Want me to walk through the math?",
-  "Can I increase my $500 limit?": "Yes, but timing matters. After 6 months of on-time payments you can request an increase. Right now the fastest path is paying your statement early — that's worth +$75 on your limit in ZETA's boost program.",
-  "Cheapest way to send money to India?": "Wise is usually the best rate — around 83 INR per dollar with a flat $2-3 fee. On $100 that's about ₹8,000 net. Takes 1-2 business days. Want me to walk through it?",
-  "Which quest helps my score the most?": "Right now: 'Bring utilization under 30%' is worth +80 XP AND could add 40-60 points to your score. That's the highest-leverage move you have this week.",
-  "How do I earn XP faster?": "Complete the utilization quest this week (+80 XP), pay your statement on time (+60 XP), and read the credit basics article (+25 XP). That's 165 XP — gets you to Level 3 in one week.",
-  "What happens at Level 3?": "Level 3 unlocks the 'Limit Climber' badge and gives you access to the VIP Boost program — which can get you a limit increase review in 48 hours instead of 30 days.",
-  "How do I climb the cohort ranking?": "Your utilization is hurting your rank the most. Bring it under 30% and you'll jump roughly 15 spots in the cohort. Your on-time payment rate is already solid at 94%.",
-  "What's the best saving challenge for me?": "The Spring Finals challenge is perfect — $200 goal, 14 people in, 45% funded. Small wins like skipping one takeout meal saves $12 instantly. You've already saved $45 — you're ahead of most.",
-  "How does saving with peers actually work?": "Everyone sets a personal savings goal. You log wins — skipping a meal out, making coffee at home — and the app tracks your streak. The money stays yours. The cohort just keeps each other accountable.",
-  "What should I do first to build credit?": "Three things in order: pay on time every month (35% of your score), keep utilization under 30% (30% of score), and don't close your card. You're already doing #1. #2 is where to focus now.",
-  "How do I send money home cheaply?": "Wise is the gold standard — low fees, live exchange rates. On $100 to India you get around ₹8,000 net. Use the Send Home button on the main screen to see live rates.",
-  "What is ZETA?": "ZETA is your financial co-pilot for the US. It tracks your credit journey, connects you with peers at UTD going through the same thing, and coaches you through every milestone — from your first card to your first limit increase.",
-};
-
 export function GlobalAIShortcut() {
   const pathname = usePathname() ?? "/";
   const ctx = CONTEXT_DATA[pathname] ?? CONTEXT_DATA["/"];
@@ -72,16 +57,67 @@ export function GlobalAIShortcut() {
   const [messages, setMessages] = useState<{ role: "user" | "ai"; text: string }[]>([]);
   const [typing, setTyping] = useState(false);
 
-  function sendMessage(text: string) {
+  async function sendMessage(text: string) {
     if (!text.trim()) return;
     setMessages(prev => [...prev, { role: "user", text }]);
     setInput("");
     setTyping(true);
-    setTimeout(() => {
-      const reply = MOCK_RESPONSES[text] ?? "Great question. Based on your profile, focus on keeping utilization low and paying on time — those two factors drive 65% of your FICO score.";
-      setMessages(prev => [...prev, { role: "ai", text: reply }]);
+
+    const conversationMessages = [...messages, { role: "user" as const, text }].map(m => ({
+      role: m.role === "ai" ? "assistant" : "user",
+      content: m.text,
+    }));
+
+    try {
+      const res = await fetch("https://voyage-zolve.vercel.app/api/buddy/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: conversationMessages }),
+      });
+
+      if (!res.ok || !res.body) throw new Error("failed");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let acc = "";
+
+      setMessages(prev => [...prev, { role: "ai", text: "" }]);
       setTyping(false);
-    }, 900);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const events = buffer.split("\n\n");
+        buffer = events.pop() ?? "";
+        for (const event of events) {
+          if (!event.startsWith("data: ")) continue;
+          try {
+            const payload = JSON.parse(event.slice(6));
+            if (payload.type === "text") {
+              acc += payload.delta;
+              setMessages(prev => {
+                const copy = [...prev];
+                copy[copy.length - 1] = { role: "ai", text: acc };
+                return copy;
+              });
+            }
+          } catch { /* skip */ }
+        }
+      }
+    } catch {
+      setMessages(prev => {
+        const copy = [...prev];
+        if (copy[copy.length - 1]?.role === "ai") {
+          copy[copy.length - 1] = { role: "ai", text: "Zolvi hit a snag. Try again in a sec." };
+        } else {
+          copy.push({ role: "ai", text: "Zolvi hit a snag. Try again in a sec." });
+        }
+        return copy;
+      });
+      setTyping(false);
+    }
   }
 
   function handleOpen() {
@@ -215,16 +251,20 @@ export function GlobalAIShortcut() {
                 {messages.length > 0 && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
                     {messages.map((m, i) => (
-                      <div key={i} style={{
-                        alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-                        maxWidth: "85%", padding: "10px 14px",
-                        borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
-                        background: m.role === "user" ? "linear-gradient(135deg,#a855f7,#e879f9)" : "rgba(255,255,255,0.05)",
-                        border: m.role === "ai" ? "1px solid rgba(168,85,247,0.15)" : "none",
-                        fontSize: 13, fontStyle: m.role === "ai" ? "italic" : "normal",
-                        fontFamily: m.role === "ai" ? "var(--font-serif)" : "inherit",
-                        color: "#f0e6ff", lineHeight: 1.5,
-                      }}>
+                      <div key={i}
+                        onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(168,85,247,0.2)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                        style={{
+                          alignSelf: m.role === "user" ? "flex-end" : "flex-start",
+                          maxWidth: "85%", padding: "10px 14px",
+                          borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
+                          background: m.role === "user" ? "linear-gradient(135deg,#a855f7,#e879f9)" : "rgba(255,255,255,0.05)",
+                          border: m.role === "ai" ? "1px solid rgba(168,85,247,0.15)" : "none",
+                          fontSize: 13, fontStyle: m.role === "ai" ? "italic" : "normal",
+                          fontFamily: m.role === "ai" ? "var(--font-serif)" : "inherit",
+                          color: "#f0e6ff", lineHeight: 1.5,
+                          transition: "transform 200ms ease, box-shadow 200ms ease",
+                        }}>
                         {m.text}
                       </div>
                     ))}
