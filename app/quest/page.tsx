@@ -109,13 +109,13 @@ export default function QuestPage() {
                   </div>
 
                   {/* Progress bar */}
-                  {q.progress > 0 && (
+                  {(q.progress ?? 0) > 0 && (
                     <div className="mb-3">
                       <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
                         <div className="h-full rounded-full transition-all duration-1000"
-                          style={{ width: `${q.progress * 100}%`, background: "linear-gradient(90deg,#a855f7,#e879f9)", boxShadow: "0 0 8px rgba(168,85,247,0.4)" }} />
+                          style={{ width: `${(q.progress ?? 0) * 100}%`, background: "linear-gradient(90deg,#a855f7,#e879f9)", boxShadow: "0 0 8px rgba(168,85,247,0.4)" }} />
                       </div>
-                      <div style={{ fontSize: "10px", color: "#5b4d6e", marginTop: "4px" }}>{Math.round(q.progress * 100)}% complete</div>
+                      <div style={{ fontSize: "10px", color: "#5b4d6e", marginTop: "4px" }}>{Math.round((q.progress ?? 0) * 100)}% complete</div>
                     </div>
                   )}
 
