@@ -25,12 +25,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             style={{ background: "radial-gradient(circle, #38bdf8, transparent 70%)", top: "40%", right: "10%", animation: "float-blob-1 14s ease-in-out infinite alternate-reverse" }} />
         </div>
         <style>{`
-          @keyframes float-blob-1 { from { transform: translate(0px,0px) scale(1); } to { transform: translate(30px,-20px) scale(1.1); } }
-          @keyframes float-blob-2 { from { transform: translate(0px,0px) scale(1); } to { transform: translate(-20px,15px) scale(0.95); } }
-          @keyframes float-card { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-4px); } }
+          @keyframes float-blob-1 { from{transform:translate(0px,0px) scale(1)} to{transform:translate(30px,-20px) scale(1.1)} }
+          @keyframes float-blob-2 { from{transform:translate(0px,0px) scale(1)} to{transform:translate(-20px,15px) scale(0.95)} }
+          @keyframes float-card { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-4px)} }
+          @keyframes spin-ring { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
           .float-card { animation: float-card 6s ease-in-out infinite; }
-          .float-card-delayed { animation: float-card 6s ease-in-out infinite; animation-delay: -2s; }
-          .float-card-slow { animation: float-card 8s ease-in-out infinite; animation-delay: -4s; }
+          .float-c { animation: float-card 6s ease-in-out infinite; }
+          .float-c2 { animation: float-card 6s ease-in-out infinite; animation-delay: -2s; }
+          .spin-ring { animation: spin-ring 4s linear infinite; }
         `}</style>
         <div className="relative z-10 min-h-screen flex items-center justify-center p-4 md:p-8">
           <div className="w-full max-w-[420px] min-h-[844px] relative flex flex-col overflow-hidden"

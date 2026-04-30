@@ -1,12 +1,14 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Map, Trophy, Users } from "lucide-react";
+import { Map, Trophy, Users, Sparkles } from "lucide-react";
+
 const tabs = [
   { href: "/",       icon: Map,    label: "Voyage" },
   { href: "/quest",  icon: Trophy, label: "Quest"  },
   { href: "/cohort", icon: Users,  label: "Cohort" },
 ];
+
 export function TabBar() {
   const path = usePathname();
   return (
@@ -29,6 +31,14 @@ export function TabBar() {
           </Link>
         );
       })}
+      <button
+        className="absolute transition-all duration-300 hover:scale-110"
+        style={{ bottom: "72px", right: "16px", width: "52px", height: "52px", borderRadius: "50%", background: "conic-gradient(from 0deg,#a855f7,#e879f9,#38bdf8,#a855f7)", boxShadow: "0 0 20px rgba(168,85,247,0.5)", animation: "spin-ring 4s linear infinite", display: "flex", alignItems: "center", justifyContent: "center" }}
+        onClick={() => window.dispatchEvent(new CustomEvent("open-buddy"))}>
+        <div className="absolute inset-[3px] rounded-full flex items-center justify-center" style={{ background: "#08001f" }}>
+          <Sparkles size={16} style={{ color: "#e879f9", filter: "drop-shadow(0 0 4px #e879f9)" }} />
+        </div>
+      </button>
     </nav>
   );
 }
