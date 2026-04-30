@@ -1,9 +1,11 @@
 "use client";
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { CreditCard, TrendingUp, Send, AlertCircle, ChevronRight, Sparkles } from "lucide-react";
 import { user, cohort, transactions } from "@/lib/world";
-import { Card, JourneyPath, SectionLabel } from "@/components/primitives";
+import { JourneyPath } from "@/components/primitives";
+import { BuddySheet } from "@/components/BuddySheet";
+import { quests } from "@/lib/world";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 function fade(delay = 0) {
@@ -22,7 +24,10 @@ export default function VoyageHome() {
   const fourWeeksAgo = new Date(today); fourWeeksAgo.setDate(today.getDate() - 28);
   const weekDining = transactions.filter(t => t.category === "Dining" && new Date(t.date) >= oneWeekAgo).reduce((s,t) => s+t.amount, 0);
   const monthDining = transactions.filter(t => t.category === "Dining" && new Date(t.date) >= fourWeeksAgo).reduce((s,t) => s+t.amount, 0);
-  const diningDelta = Math.round(((weekDining - monthDining/4) / (monthDining/4)) * 100);
+  const monthlyAvgDining = monthDining / 4;
+  const diningDelta = monthlyAvgDining > 0
+  ? Math.round(((weekDining - monthlyAvgDining) / monthlyAvgDining) * 100)
+  : 0;
 
   return (
     <main className="flex flex-col flex-1 overflow-y-auto pb-28">
@@ -203,26 +208,7 @@ export default function VoyageHome() {
       </div>
 
       {/* Buddy sheet */}
-      <AnimatePresence>
-        {buddyOpen && (
-          <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
-            className="fixed inset-0 z-50 flex items-end"
-            style={{ background:"rgba(3,0,10,0.85)", backdropFilter:"blur(8px)" }}
-            onClick={() => setBuddyOpen(false)}>
-            <motion.div initial={{ y:100,opacity:0 }} animate={{ y:0,opacity:1 }} exit={{ y:100,opacity:0 }}
-              transition={{ duration:0.4, ease:[0.22,1,0.36,1] }}
-              className="w-full max-w-[420px] mx-auto rounded-t-3xl p-6 pb-10"
-              style={{ background:"linear-gradient(135deg,rgba(168,85,247,0.08),rgba(8,0,31,0.98))", border:"1px solid rgba(168,85,247,0.15)", borderBottom:"none", boxShadow:"0 -20px 60px rgba(168,85,247,0.1)" }}
-              onClick={e => e.stopPropagation()}>
-              <div className="w-10 h-1 rounded-full mx-auto mb-6" style={{ background:"rgba(168,85,247,0.3)" }} />
-              <p style={{ fontFamily:"var(--font-serif)", fontStyle:"italic", fontSize:"18px", color:"#f0e6ff", textAlign:"center", textShadow:"0 0 20px rgba(168,85,247,0.3)" }}>
-                AI Buddy arrives in Phase 5 ✦
-              </p>
-              <p style={{ fontSize:"12px", color:"#5b4d6e", textAlign:"center", marginTop:"8px" }}>Streaming Claude responses, live.</p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <BuddySheet open={buddyOpen} onClose={() => setBuddyOpen(false)} />
     </main>
   );
 }

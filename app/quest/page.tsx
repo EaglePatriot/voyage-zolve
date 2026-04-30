@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { quests } from "@/lib/world";a
+import { quests } from "@/lib/world";
 import { Trophy, Lock, CheckCircle, Zap } from "lucide-react";
 
 const ease = [0.22, 1, 0.36, 1] as const;

@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     );
 
     const stream = await client.messages.stream({
-      model: "claude-haiku-4-5",
+      model: "claude-sonnet-4-5",
       max_tokens: 300,
       system: `${BUDDY_SYSTEM_PROMPT}\n\n${context}`,
       messages,
