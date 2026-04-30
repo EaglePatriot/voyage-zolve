@@ -1,0 +1,1521 @@
+{
+  "generatedAt": "2026-04-29T00:00:00",
+  "user": {
+    "id": "yash-001",
+    "name": "Yashwardhan",
+    "initials": "Y",
+    "country": "India",
+    "school": "Arizona State University",
+    "program": "M.S. Technology Management",
+    "visa": "F-1",
+    "arrivalDate": "2025-08-12",
+    "daysInUS": 260,
+    "stage": "Internship Prep",
+    "stageNumber": 3,
+    "totalStages": 5,
+    "stageProgress": 0.65,
+    "nextStage": "First Job",
+    "nextStageEta": "Aug 2026",
+    "creditScore": 718,
+    "creditScoreStart": 680,
+    "creditScoreSeries": [
+      {
+        "date": "2026-01-29",
+        "score": 686
+      },
+      {
+        "date": "2026-02-05",
+        "score": 689
+      },
+      {
+        "date": "2026-02-12",
+        "score": 691
+      },
+      {
+        "date": "2026-02-19",
+        "score": 698
+      },
+      {
+        "date": "2026-02-26",
+        "score": 700
+      },
+      {
+        "date": "2026-03-05",
+        "score": 705
+      },
+      {
+        "date": "2026-03-12",
+        "score": 708
+      },
+      {
+        "date": "2026-03-19",
+        "score": 714
+      },
+      {
+        "date": "2026-03-26",
+        "score": 718
+      },
+      {
+        "date": "2026-04-02",
+        "score": 718
+      },
+      {
+        "date": "2026-04-09",
+        "score": 718
+      },
+      {
+        "date": "2026-04-16",
+        "score": 720
+      },
+      {
+        "date": "2026-04-23",
+        "score": 720
+      }
+    ],
+    "creditLimit": 3500,
+    "currentBalance": 840,
+    "currentUtilization": 24.0,
+    "savingsRate": 8.5,
+    "onTimePayments": 98.0
+  },
+  "transactions": [
+    {
+      "id": "bdd640fb",
+      "date": "2026-01-29",
+      "amount": 16.25,
+      "category": "Dining",
+      "merchant": "Curry Corner Tempe"
+    },
+    {
+      "id": "23b8c1e9",
+      "date": "2026-01-29",
+      "amount": 22.17,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "bd9c66b3",
+      "date": "2026-01-30",
+      "amount": 21.56,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "972a8469",
+      "date": "2026-02-01",
+      "amount": 850,
+      "category": "Rent",
+      "merchant": "ASU Vista del Sol"
+    },
+    {
+      "id": "17fc695a",
+      "date": "2026-02-01",
+      "amount": 16.35,
+      "category": "Dining",
+      "merchant": "Chipotle Mexican Grill"
+    },
+    {
+      "id": "9a1de644",
+      "date": "2026-02-02",
+      "amount": 14.46,
+      "category": "Dining",
+      "merchant": "Saffron Indian Kitchen"
+    },
+    {
+      "id": "b74d0fb1",
+      "date": "2026-02-02",
+      "amount": 41.59,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "6b65a6a4",
+      "date": "2026-02-03",
+      "amount": 40.43,
+      "category": "Groceries",
+      "merchant": "Patel Brothers Tempe"
+    },
+    {
+      "id": "47378190",
+      "date": "2026-02-05",
+      "amount": 35,
+      "category": "Phone",
+      "merchant": "Verizon Wireless"
+    },
+    {
+      "id": "c241330b",
+      "date": "2026-02-05",
+      "amount": 10.42,
+      "category": "Transport",
+      "merchant": "Uber"
+    },
+    {
+      "id": "6c307511",
+      "date": "2026-02-06",
+      "amount": 31.75,
+      "category": "Groceries",
+      "merchant": "Trader Joe's"
+    },
+    {
+      "id": "371ecd7b",
+      "date": "2026-02-07",
+      "amount": 18.66,
+      "category": "Dining",
+      "merchant": "Halal Guys"
+    },
+    {
+      "id": "1a2a73ed",
+      "date": "2026-02-07",
+      "amount": 80.57,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "5be6128e",
+      "date": "2026-02-08",
+      "amount": 11,
+      "category": "Subscription",
+      "merchant": "Spotify"
+    },
+    {
+      "id": "43b7a3a6",
+      "date": "2026-02-08",
+      "amount": 15,
+      "category": "Subscription",
+      "merchant": "Netflix"
+    },
+    {
+      "id": "759cde66",
+      "date": "2026-02-08",
+      "amount": 20,
+      "category": "Subscription",
+      "merchant": "ChatGPT Plus"
+    },
+    {
+      "id": "ec1b8ca1",
+      "date": "2026-02-08",
+      "amount": 29.87,
+      "category": "Dining",
+      "merchant": "Curry Corner Tempe"
+    },
+    {
+      "id": "4b0dbb41",
+      "date": "2026-02-09",
+      "amount": 37.7,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "e2acf72f",
+      "date": "2026-02-10",
+      "amount": 35,
+      "category": "Transport",
+      "merchant": "Valley Metro Rail"
+    },
+    {
+      "id": "3139d32c",
+      "date": "2026-02-10",
+      "amount": 66.62,
+      "category": "Groceries",
+      "merchant": "Walmart Neighborhood Market"
+    },
+    {
+      "id": "a9488d99",
+      "date": "2026-02-10",
+      "amount": 9.99,
+      "category": "Dining",
+      "merchant": "Starbucks"
+    },
+    {
+      "id": "fc377a4c",
+      "date": "2026-02-11",
+      "amount": 35.44,
+      "category": "Dining",
+      "merchant": "Dutch Bros Coffee"
+    },
+    {
+      "id": "ddd1dfb2",
+      "date": "2026-02-11",
+      "amount": 24.77,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "7412b293",
+      "date": "2026-02-13",
+      "amount": 49.55,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "29a3b2e9",
+      "date": "2026-02-14",
+      "amount": 12.8,
+      "category": "Dining",
+      "merchant": "Halal Guys"
+    },
+    {
+      "id": "ab9099a4",
+      "date": "2026-02-14",
+      "amount": 12.72,
+      "category": "Transport",
+      "merchant": "Uber"
+    },
+    {
+      "id": "aefcfad8",
+      "date": "2026-02-16",
+      "amount": 61.87,
+      "category": "Groceries",
+      "merchant": "Walmart Neighborhood Market"
+    },
+    {
+      "id": "a28defe3",
+      "date": "2026-02-17",
+      "amount": 28.15,
+      "category": "Groceries",
+      "merchant": "Walmart Neighborhood Market"
+    },
+    {
+      "id": "3eabedcb",
+      "date": "2026-02-18",
+      "amount": 57.39,
+      "category": "Groceries",
+      "merchant": "Trader Joe's"
+    },
+    {
+      "id": "451b4cf3",
+      "date": "2026-02-18",
+      "amount": 30.88,
+      "category": "Dining",
+      "merchant": "Starbucks"
+    },
+    {
+      "id": "b02b61c4",
+      "date": "2026-02-19",
+      "amount": 12.44,
+      "category": "Transport",
+      "merchant": "Uber"
+    },
+    {
+      "id": "5304317f",
+      "date": "2026-02-20",
+      "amount": 31.86,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "0e51f30d",
+      "date": "2026-02-21",
+      "amount": 62.4,
+      "category": "Groceries",
+      "merchant": "Patel Brothers Tempe"
+    },
+    {
+      "id": "ce177b4e",
+      "date": "2026-02-22",
+      "amount": 51.94,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "10f1bc81",
+      "date": "2026-02-24",
+      "amount": 28.15,
+      "category": "Dining",
+      "merchant": "Saffron Indian Kitchen"
+    },
+    {
+      "id": "9132b63e",
+      "date": "2026-02-25",
+      "amount": 38.56,
+      "category": "Groceries",
+      "merchant": "Walmart Neighborhood Market"
+    },
+    {
+      "id": "366eb16f",
+      "date": "2026-02-25",
+      "amount": 24.62,
+      "category": "Dining",
+      "merchant": "Starbucks"
+    },
+    {
+      "id": "e27a984d",
+      "date": "2026-02-25",
+      "amount": 19.97,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "24933b83",
+      "date": "2026-02-26",
+      "amount": 70.55,
+      "category": "Groceries",
+      "merchant": "Walmart Neighborhood Market"
+    },
+    {
+      "id": "beb79919",
+      "date": "2026-02-26",
+      "amount": 15.14,
+      "category": "Dining",
+      "merchant": "Halal Guys"
+    },
+    {
+      "id": "bf3c4c06",
+      "date": "2026-02-28",
+      "amount": 10.83,
+      "category": "Dining",
+      "merchant": "Halal Guys"
+    },
+    {
+      "id": "956269f0",
+      "date": "2026-03-01",
+      "amount": 850,
+      "category": "Rent",
+      "merchant": "ASU Vista del Sol"
+    },
+    {
+      "id": "ff50bde4",
+      "date": "2026-03-02",
+      "amount": 46.92,
+      "category": "Groceries",
+      "merchant": "Walmart Neighborhood Market"
+    },
+    {
+      "id": "7e570ddf",
+      "date": "2026-03-02",
+      "amount": 28.41,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "dc713d96",
+      "date": "2026-03-03",
+      "amount": 36.62,
+      "category": "Groceries",
+      "merchant": "Fry's Food Store"
+    },
+    {
+      "id": "28f49481",
+      "date": "2026-03-03",
+      "amount": 35.7,
+      "category": "Dining",
+      "merchant": "Dutch Bros Coffee"
+    },
+    {
+      "id": "98ae4334",
+      "date": "2026-03-04",
+      "amount": 58.65,
+      "category": "Groceries",
+      "merchant": "Patel Brothers Tempe"
+    },
+    {
+      "id": "988c24c9",
+      "date": "2026-03-05",
+      "amount": 35,
+      "category": "Phone",
+      "merchant": "Verizon Wireless"
+    },
+    {
+      "id": "405cacec",
+      "date": "2026-03-05",
+      "amount": 50.83,
+      "category": "Groceries",
+      "merchant": "Trader Joe's"
+    },
+    {
+      "id": "f143262f",
+      "date": "2026-03-06",
+      "amount": 46.35,
+      "category": "Groceries",
+      "merchant": "Fry's Food Store"
+    },
+    {
+      "id": "1d53434b",
+      "date": "2026-03-06",
+      "amount": 28.9,
+      "category": "Dining",
+      "merchant": "Halal Guys"
+    },
+    {
+      "id": "c0398710",
+      "date": "2026-03-07",
+      "amount": 16.9,
+      "category": "Dining",
+      "merchant": "Chipotle Mexican Grill"
+    },
+    {
+      "id": "5715bd6f",
+      "date": "2026-03-08",
+      "amount": 11,
+      "category": "Subscription",
+      "merchant": "Spotify"
+    },
+    {
+      "id": "287d06ca",
+      "date": "2026-03-08",
+      "amount": 15,
+      "category": "Subscription",
+      "merchant": "Netflix"
+    },
+    {
+      "id": "b8db0672",
+      "date": "2026-03-08",
+      "amount": 20,
+      "category": "Subscription",
+      "merchant": "ChatGPT Plus"
+    },
+    {
+      "id": "f8cda88b",
+      "date": "2026-03-08",
+      "amount": 25.53,
+      "category": "Dining",
+      "merchant": "Starbucks"
+    },
+    {
+      "id": "81f76d1c",
+      "date": "2026-03-09",
+      "amount": 51.87,
+      "category": "Groceries",
+      "merchant": "Trader Joe's"
+    },
+    {
+      "id": "a013ac6e",
+      "date": "2026-03-09",
+      "amount": 10.04,
+      "category": "Dining",
+      "merchant": "Curry Corner Tempe"
+    },
+    {
+      "id": "81f631d4",
+      "date": "2026-03-10",
+      "amount": 35,
+      "category": "Transport",
+      "merchant": "Valley Metro Rail"
+    },
+    {
+      "id": "5fb8d16c",
+      "date": "2026-03-10",
+      "amount": 20.74,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "f4188f3f",
+      "date": "2026-03-11",
+      "amount": 15.82,
+      "category": "Dining",
+      "merchant": "Halal Guys"
+    },
+    {
+      "id": "eb2263dd",
+      "date": "2026-03-13",
+      "amount": 21.75,
+      "category": "Dining",
+      "merchant": "Starbucks"
+    },
+    {
+      "id": "7d154385",
+      "date": "2026-03-13",
+      "amount": 10.2,
+      "category": "Transport",
+      "merchant": "Uber"
+    },
+    {
+      "id": "5cec4eb5",
+      "date": "2026-03-14",
+      "amount": 71.86,
+      "category": "Groceries",
+      "merchant": "Patel Brothers Tempe"
+    },
+    {
+      "id": "ce88cb2d",
+      "date": "2026-03-16",
+      "amount": 32.51,
+      "category": "Dining",
+      "merchant": "Saffron Indian Kitchen"
+    },
+    {
+      "id": "3da9c2a9",
+      "date": "2026-03-16",
+      "amount": 20.17,
+      "category": "Transport",
+      "merchant": "Uber"
+    },
+    {
+      "id": "14296c07",
+      "date": "2026-03-17",
+      "amount": 69.82,
+      "category": "Groceries",
+      "merchant": "Trader Joe's"
+    },
+    {
+      "id": "d0e6e660",
+      "date": "2026-03-17",
+      "amount": 26.14,
+      "category": "Dining",
+      "merchant": "Halal Guys"
+    },
+    {
+      "id": "885f6e66",
+      "date": "2026-03-18",
+      "amount": 78.57,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "a8e56e0c",
+      "date": "2026-03-18",
+      "amount": 16.51,
+      "category": "Transport",
+      "merchant": "Uber"
+    },
+    {
+      "id": "2a45c2ab",
+      "date": "2026-03-19",
+      "amount": 18.01,
+      "category": "Dining",
+      "merchant": "Curry Corner Tempe"
+    },
+    {
+      "id": "9b49bd26",
+      "date": "2026-03-20",
+      "amount": 8.13,
+      "category": "Transport",
+      "merchant": "Uber"
+    },
+    {
+      "id": "edcd465e",
+      "date": "2026-03-22",
+      "amount": 11.82,
+      "category": "Dining",
+      "merchant": "Saffron Indian Kitchen"
+    },
+    {
+      "id": "b09b2a5c",
+      "date": "2026-03-23",
+      "amount": 18.73,
+      "category": "Dining",
+      "merchant": "Halal Guys"
+    },
+    {
+      "id": "66245bfa",
+      "date": "2026-03-23",
+      "amount": 22.2,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "5f987c71",
+      "date": "2026-03-24",
+      "amount": 26.62,
+      "category": "Dining",
+      "merchant": "Curry Corner Tempe"
+    },
+    {
+      "id": "7394988f",
+      "date": "2026-03-25",
+      "amount": 65.59,
+      "category": "Groceries",
+      "merchant": "Trader Joe's"
+    },
+    {
+      "id": "1064005c",
+      "date": "2026-03-25",
+      "amount": 66.56,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "8dcdcd03",
+      "date": "2026-03-27",
+      "amount": 65.01,
+      "category": "Groceries",
+      "merchant": "Patel Brothers Tempe"
+    },
+    {
+      "id": "01d74256",
+      "date": "2026-03-27",
+      "amount": 9.16,
+      "category": "Dining",
+      "merchant": "Dutch Bros Coffee"
+    },
+    {
+      "id": "0f1259e0",
+      "date": "2026-03-27",
+      "amount": 72.16,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "080aadfb",
+      "date": "2026-03-28",
+      "amount": 65.38,
+      "category": "Groceries",
+      "merchant": "Trader Joe's"
+    },
+    {
+      "id": "839fbc50",
+      "date": "2026-03-28",
+      "amount": 27.8,
+      "category": "Dining",
+      "merchant": "Dutch Bros Coffee"
+    },
+    {
+      "id": "7c441fe7",
+      "date": "2026-03-29",
+      "amount": 27.24,
+      "category": "Dining",
+      "merchant": "Dutch Bros Coffee"
+    },
+    {
+      "id": "b92da22b",
+      "date": "2026-03-30",
+      "amount": 29.3,
+      "category": "Groceries",
+      "merchant": "Walmart Neighborhood Market"
+    },
+    {
+      "id": "93829b43",
+      "date": "2026-03-30",
+      "amount": 36.88,
+      "category": "Dining",
+      "merchant": "Saffron Indian Kitchen"
+    },
+    {
+      "id": "7914c120",
+      "date": "2026-03-30",
+      "amount": 56.76,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "1825bc54",
+      "date": "2026-03-31",
+      "amount": 37.53,
+      "category": "Dining",
+      "merchant": "Chipotle Mexican Grill"
+    },
+    {
+      "id": "5ab33edf",
+      "date": "2026-04-01",
+      "amount": 850,
+      "category": "Rent",
+      "merchant": "ASU Vista del Sol"
+    },
+    {
+      "id": "dd2467ac",
+      "date": "2026-04-01",
+      "amount": 61.31,
+      "category": "Groceries",
+      "merchant": "Patel Brothers Tempe"
+    },
+    {
+      "id": "a748dbcf",
+      "date": "2026-04-02",
+      "amount": 45.19,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "0f844fef",
+      "date": "2026-04-05",
+      "amount": 35,
+      "category": "Phone",
+      "merchant": "Verizon Wireless"
+    },
+    {
+      "id": "ccf3a171",
+      "date": "2026-04-05",
+      "amount": 61.55,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "310c0c00",
+      "date": "2026-04-06",
+      "amount": 25.07,
+      "category": "Dining",
+      "merchant": "Dutch Bros Coffee"
+    },
+    {
+      "id": "23e2fcb4",
+      "date": "2026-04-06",
+      "amount": 11.3,
+      "category": "Transport",
+      "merchant": "Uber"
+    },
+    {
+      "id": "766ecb15",
+      "date": "2026-04-08",
+      "amount": 11,
+      "category": "Subscription",
+      "merchant": "Spotify"
+    },
+    {
+      "id": "134c6c92",
+      "date": "2026-04-08",
+      "amount": 15,
+      "category": "Subscription",
+      "merchant": "Netflix"
+    },
+    {
+      "id": "db20a56e",
+      "date": "2026-04-08",
+      "amount": 20,
+      "category": "Subscription",
+      "merchant": "ChatGPT Plus"
+    },
+    {
+      "id": "a6f2f7b8",
+      "date": "2026-04-08",
+      "amount": 22.2,
+      "category": "Dining",
+      "merchant": "Halal Guys"
+    },
+    {
+      "id": "03c72ba8",
+      "date": "2026-04-08",
+      "amount": 20.94,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "c0e9ab30",
+      "date": "2026-04-09",
+      "amount": 32.55,
+      "category": "Dining",
+      "merchant": "Curry Corner Tempe"
+    },
+    {
+      "id": "680ac07a",
+      "date": "2026-04-10",
+      "amount": 35,
+      "category": "Transport",
+      "merchant": "Valley Metro Rail"
+    },
+    {
+      "id": "dd59ba71",
+      "date": "2026-04-10",
+      "amount": 29.15,
+      "category": "Groceries",
+      "merchant": "Trader Joe's"
+    },
+    {
+      "id": "2a25a888",
+      "date": "2026-04-12",
+      "amount": 12.43,
+      "category": "Dining",
+      "merchant": "Halal Guys"
+    },
+    {
+      "id": "63f2ae24",
+      "date": "2026-04-12",
+      "amount": 67.57,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "c8fe3ccd",
+      "date": "2026-04-13",
+      "amount": 47.98,
+      "category": "Groceries",
+      "merchant": "Trader Joe's"
+    },
+    {
+      "id": "b253d218",
+      "date": "2026-04-14",
+      "amount": 24.33,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "c88a618e",
+      "date": "2026-04-17",
+      "amount": 12.77,
+      "category": "Dining",
+      "merchant": "Dutch Bros Coffee"
+    },
+    {
+      "id": "7c967f79",
+      "date": "2026-04-18",
+      "amount": 31.33,
+      "category": "Dining",
+      "merchant": "Dutch Bros Coffee"
+    },
+    {
+      "id": "37bb3eec",
+      "date": "2026-04-19",
+      "amount": 41.43,
+      "category": "Groceries",
+      "merchant": "Walmart Neighborhood Market"
+    },
+    {
+      "id": "bc594585",
+      "date": "2026-04-19",
+      "amount": 34.79,
+      "category": "Dining",
+      "merchant": "Chipotle Mexican Grill"
+    },
+    {
+      "id": "504867ba",
+      "date": "2026-04-19",
+      "amount": 31.19,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "7a0ecfea",
+      "date": "2026-04-20",
+      "amount": 20.23,
+      "category": "Dining",
+      "merchant": "Starbucks"
+    },
+    {
+      "id": "87f7e1fb",
+      "date": "2026-04-20",
+      "amount": 19.49,
+      "category": "Transport",
+      "merchant": "Uber"
+    },
+    {
+      "id": "82010c62",
+      "date": "2026-04-21",
+      "amount": 20.21,
+      "category": "Transport",
+      "merchant": "Uber"
+    },
+    {
+      "id": "118a9d29",
+      "date": "2026-04-25",
+      "amount": 50.83,
+      "category": "Groceries",
+      "merchant": "Fry's Food Store"
+    },
+    {
+      "id": "dca02eec",
+      "date": "2026-04-25",
+      "amount": 28.37,
+      "category": "Dining",
+      "merchant": "Dutch Bros Coffee"
+    },
+    {
+      "id": "f10c718b",
+      "date": "2026-04-27",
+      "amount": 45.0,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "94340a03",
+      "date": "2026-04-28",
+      "amount": 40.23,
+      "category": "Groceries",
+      "merchant": "Walmart Neighborhood Market"
+    },
+    {
+      "id": "14fcdd54",
+      "date": "2026-04-28",
+      "amount": 17.81,
+      "category": "Dining",
+      "merchant": "Dutch Bros Coffee"
+    },
+    {
+      "id": "90b2b633",
+      "date": "2026-04-28",
+      "amount": 81.58,
+      "category": "Shopping",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "42c18a62",
+      "date": "2026-04-29",
+      "amount": 21.28,
+      "category": "Transport",
+      "merchant": "Uber"
+    }
+  ],
+  "cohort": {
+    "name": "ASU Intl Grads",
+    "subtitle": "Class of '26",
+    "size": 47,
+    "countryBreakdown": {
+      "India": "60%",
+      "China": "21%",
+      "Brazil": "11%",
+      "Other": "8%"
+    },
+    "members": [
+      {
+        "id": "m001",
+        "initials": "NQ",
+        "country": "India",
+        "avg_monthly_spend": 1339.08,
+        "savings_rate": 8.1,
+        "credit_utilization": 40.4,
+        "on_time_payments_pct": 100.0,
+        "current_credit_score": 725
+      },
+      {
+        "id": "m002",
+        "initials": "TU",
+        "country": "India",
+        "avg_monthly_spend": 1068.55,
+        "savings_rate": 10.0,
+        "credit_utilization": 19.3,
+        "on_time_payments_pct": 85.4,
+        "current_credit_score": 667
+      },
+      {
+        "id": "m003",
+        "initials": "PQ",
+        "country": "China",
+        "avg_monthly_spend": 916.41,
+        "savings_rate": 9.2,
+        "credit_utilization": 5.0,
+        "on_time_payments_pct": 94.3,
+        "current_credit_score": 629
+      },
+      {
+        "id": "m004",
+        "initials": "ZI",
+        "country": "Mexico",
+        "avg_monthly_spend": 1047.57,
+        "savings_rate": 8.0,
+        "credit_utilization": 51.1,
+        "on_time_payments_pct": 91.0,
+        "current_credit_score": 773
+      },
+      {
+        "id": "m005",
+        "initials": "QP",
+        "country": "China",
+        "avg_monthly_spend": 1196.22,
+        "savings_rate": 2.9,
+        "credit_utilization": 41.6,
+        "on_time_payments_pct": 95.0,
+        "current_credit_score": 605
+      },
+      {
+        "id": "m006",
+        "initials": "TD",
+        "country": "India",
+        "avg_monthly_spend": 828.11,
+        "savings_rate": 6.6,
+        "credit_utilization": 50.0,
+        "on_time_payments_pct": 93.4,
+        "current_credit_score": 678
+      },
+      {
+        "id": "m007",
+        "initials": "UW",
+        "country": "India",
+        "avg_monthly_spend": 786.01,
+        "savings_rate": 5.8,
+        "credit_utilization": 20.0,
+        "on_time_payments_pct": 95.6,
+        "current_credit_score": 675
+      },
+      {
+        "id": "m008",
+        "initials": "EA",
+        "country": "India",
+        "avg_monthly_spend": 1010.46,
+        "savings_rate": 7.6,
+        "credit_utilization": 50.1,
+        "on_time_payments_pct": 89.8,
+        "current_credit_score": 678
+      },
+      {
+        "id": "m009",
+        "initials": "DN",
+        "country": "Mexico",
+        "avg_monthly_spend": 1292.75,
+        "savings_rate": 10.9,
+        "credit_utilization": 28.0,
+        "on_time_payments_pct": 98.1,
+        "current_credit_score": 751
+      },
+      {
+        "id": "m010",
+        "initials": "KG",
+        "country": "Brazil",
+        "avg_monthly_spend": 1179.84,
+        "savings_rate": 8.3,
+        "credit_utilization": 48.5,
+        "on_time_payments_pct": 93.8,
+        "current_credit_score": 760
+      },
+      {
+        "id": "m011",
+        "initials": "EI",
+        "country": "China",
+        "avg_monthly_spend": 466.47,
+        "savings_rate": 14.2,
+        "credit_utilization": 52.7,
+        "on_time_payments_pct": 92.9,
+        "current_credit_score": 707
+      },
+      {
+        "id": "m012",
+        "initials": "NG",
+        "country": "Brazil",
+        "avg_monthly_spend": 1613.81,
+        "savings_rate": 4.6,
+        "credit_utilization": 27.7,
+        "on_time_payments_pct": 98.6,
+        "current_credit_score": 706
+      },
+      {
+        "id": "m013",
+        "initials": "QI",
+        "country": "India",
+        "avg_monthly_spend": 1051.67,
+        "savings_rate": 5.8,
+        "credit_utilization": 38.0,
+        "on_time_payments_pct": 90.5,
+        "current_credit_score": 677
+      },
+      {
+        "id": "m014",
+        "initials": "WE",
+        "country": "South Korea",
+        "avg_monthly_spend": 1090.21,
+        "savings_rate": 5.0,
+        "credit_utilization": 40.9,
+        "on_time_payments_pct": 92.3,
+        "current_credit_score": 656
+      },
+      {
+        "id": "m015",
+        "initials": "PX",
+        "country": "India",
+        "avg_monthly_spend": 1154.84,
+        "savings_rate": 10.4,
+        "credit_utilization": 58.9,
+        "on_time_payments_pct": 84.4,
+        "current_credit_score": 690
+      },
+      {
+        "id": "m016",
+        "initials": "SK",
+        "country": "India",
+        "avg_monthly_spend": 1216.86,
+        "savings_rate": 15.6,
+        "credit_utilization": 30.6,
+        "on_time_payments_pct": 93.8,
+        "current_credit_score": 640
+      },
+      {
+        "id": "m017",
+        "initials": "CI",
+        "country": "China",
+        "avg_monthly_spend": 1519.99,
+        "savings_rate": 11.7,
+        "credit_utilization": 58.5,
+        "on_time_payments_pct": 96.9,
+        "current_credit_score": 788
+      },
+      {
+        "id": "m018",
+        "initials": "TT",
+        "country": "India",
+        "avg_monthly_spend": 922.65,
+        "savings_rate": 2.5,
+        "credit_utilization": 49.9,
+        "on_time_payments_pct": 86.2,
+        "current_credit_score": 695
+      },
+      {
+        "id": "m019",
+        "initials": "NZ",
+        "country": "China",
+        "avg_monthly_spend": 902.55,
+        "savings_rate": 6.9,
+        "credit_utilization": 32.3,
+        "on_time_payments_pct": 90.1,
+        "current_credit_score": 677
+      },
+      {
+        "id": "m020",
+        "initials": "PH",
+        "country": "China",
+        "avg_monthly_spend": 1427.78,
+        "savings_rate": 1.5,
+        "credit_utilization": 78.2,
+        "on_time_payments_pct": 95.3,
+        "current_credit_score": 726
+      },
+      {
+        "id": "m021",
+        "initials": "AQ",
+        "country": "India",
+        "avg_monthly_spend": 853.65,
+        "savings_rate": 1.7,
+        "credit_utilization": 55.7,
+        "on_time_payments_pct": 95.5,
+        "current_credit_score": 660
+      },
+      {
+        "id": "m022",
+        "initials": "JT",
+        "country": "China",
+        "avg_monthly_spend": 1722.42,
+        "savings_rate": 6.7,
+        "credit_utilization": 18.8,
+        "on_time_payments_pct": 99.8,
+        "current_credit_score": 655
+      },
+      {
+        "id": "m023",
+        "initials": "QG",
+        "country": "India",
+        "avg_monthly_spend": 1469.75,
+        "savings_rate": 10.2,
+        "credit_utilization": 37.5,
+        "on_time_payments_pct": 89.6,
+        "current_credit_score": 656
+      },
+      {
+        "id": "m024",
+        "initials": "IQ",
+        "country": "India",
+        "avg_monthly_spend": 1178.41,
+        "savings_rate": 5.5,
+        "credit_utilization": 44.1,
+        "on_time_payments_pct": 92.7,
+        "current_credit_score": 790
+      },
+      {
+        "id": "m025",
+        "initials": "HG",
+        "country": "India",
+        "avg_monthly_spend": 1375.19,
+        "savings_rate": 3.2,
+        "credit_utilization": 32.7,
+        "on_time_payments_pct": 92.9,
+        "current_credit_score": 723
+      },
+      {
+        "id": "m026",
+        "initials": "VJ",
+        "country": "Brazil",
+        "avg_monthly_spend": 1332.51,
+        "savings_rate": 6.8,
+        "credit_utilization": 48.2,
+        "on_time_payments_pct": 91.8,
+        "current_credit_score": 729
+      },
+      {
+        "id": "m027",
+        "initials": "JR",
+        "country": "India",
+        "avg_monthly_spend": 1259.95,
+        "savings_rate": 1.8,
+        "credit_utilization": 65.0,
+        "on_time_payments_pct": 94.3,
+        "current_credit_score": 641
+      },
+      {
+        "id": "m028",
+        "initials": "SM",
+        "country": "India",
+        "avg_monthly_spend": 1300.18,
+        "savings_rate": 11.2,
+        "credit_utilization": 58.5,
+        "on_time_payments_pct": 96.6,
+        "current_credit_score": 714
+      },
+      {
+        "id": "m029",
+        "initials": "NT",
+        "country": "India",
+        "avg_monthly_spend": 1344.21,
+        "savings_rate": 9.6,
+        "credit_utilization": 15.4,
+        "on_time_payments_pct": 86.5,
+        "current_credit_score": 699
+      },
+      {
+        "id": "m030",
+        "initials": "VN",
+        "country": "India",
+        "avg_monthly_spend": 960.34,
+        "savings_rate": 7.2,
+        "credit_utilization": 28.0,
+        "on_time_payments_pct": 94.4,
+        "current_credit_score": 652
+      },
+      {
+        "id": "m031",
+        "initials": "RO",
+        "country": "India",
+        "avg_monthly_spend": 1106.25,
+        "savings_rate": 12.8,
+        "credit_utilization": 75.6,
+        "on_time_payments_pct": 100.0,
+        "current_credit_score": 751
+      },
+      {
+        "id": "m032",
+        "initials": "QG",
+        "country": "Nigeria",
+        "avg_monthly_spend": 1432.05,
+        "savings_rate": 5.5,
+        "credit_utilization": 27.4,
+        "on_time_payments_pct": 85.7,
+        "current_credit_score": 658
+      },
+      {
+        "id": "m033",
+        "initials": "FQ",
+        "country": "India",
+        "avg_monthly_spend": 1665.16,
+        "savings_rate": 5.5,
+        "credit_utilization": 51.1,
+        "on_time_payments_pct": 100.0,
+        "current_credit_score": 708
+      },
+      {
+        "id": "m034",
+        "initials": "DF",
+        "country": "India",
+        "avg_monthly_spend": 1662.38,
+        "savings_rate": 1.1,
+        "credit_utilization": 31.0,
+        "on_time_payments_pct": 100.0,
+        "current_credit_score": 691
+      },
+      {
+        "id": "m035",
+        "initials": "OB",
+        "country": "China",
+        "avg_monthly_spend": 938.87,
+        "savings_rate": 2.2,
+        "credit_utilization": 61.2,
+        "on_time_payments_pct": 100.0,
+        "current_credit_score": 686
+      },
+      {
+        "id": "m036",
+        "initials": "RC",
+        "country": "India",
+        "avg_monthly_spend": 1069.61,
+        "savings_rate": 3.4,
+        "credit_utilization": 31.6,
+        "on_time_payments_pct": 94.3,
+        "current_credit_score": 720
+      },
+      {
+        "id": "m037",
+        "initials": "AV",
+        "country": "India",
+        "avg_monthly_spend": 1235.31,
+        "savings_rate": 0.6,
+        "credit_utilization": 46.7,
+        "on_time_payments_pct": 94.4,
+        "current_credit_score": 711
+      },
+      {
+        "id": "m038",
+        "initials": "XI",
+        "country": "China",
+        "avg_monthly_spend": 1169.62,
+        "savings_rate": 4.2,
+        "credit_utilization": 24.4,
+        "on_time_payments_pct": 92.2,
+        "current_credit_score": 733
+      },
+      {
+        "id": "m039",
+        "initials": "OQ",
+        "country": "India",
+        "avg_monthly_spend": 1606.71,
+        "savings_rate": 6.6,
+        "credit_utilization": 44.4,
+        "on_time_payments_pct": 90.4,
+        "current_credit_score": 613
+      },
+      {
+        "id": "m040",
+        "initials": "KV",
+        "country": "Brazil",
+        "avg_monthly_spend": 858.24,
+        "savings_rate": 2.7,
+        "credit_utilization": 61.4,
+        "on_time_payments_pct": 91.8,
+        "current_credit_score": 674
+      },
+      {
+        "id": "m041",
+        "initials": "CJ",
+        "country": "India",
+        "avg_monthly_spend": 1273.25,
+        "savings_rate": 4.8,
+        "credit_utilization": 30.9,
+        "on_time_payments_pct": 98.3,
+        "current_credit_score": 680
+      },
+      {
+        "id": "m042",
+        "initials": "TB",
+        "country": "India",
+        "avg_monthly_spend": 1028.33,
+        "savings_rate": 11.7,
+        "credit_utilization": 55.5,
+        "on_time_payments_pct": 88.0,
+        "current_credit_score": 725
+      },
+      {
+        "id": "m043",
+        "initials": "JA",
+        "country": "India",
+        "avg_monthly_spend": 1386.78,
+        "savings_rate": 3.8,
+        "credit_utilization": 29.7,
+        "on_time_payments_pct": 98.0,
+        "current_credit_score": 719
+      },
+      {
+        "id": "m044",
+        "initials": "HE",
+        "country": "Brazil",
+        "avg_monthly_spend": 1580.21,
+        "savings_rate": 4.3,
+        "credit_utilization": 54.6,
+        "on_time_payments_pct": 91.6,
+        "current_credit_score": 662
+      },
+      {
+        "id": "m045",
+        "initials": "SJ",
+        "country": "China",
+        "avg_monthly_spend": 1580.83,
+        "savings_rate": 14.1,
+        "credit_utilization": 34.9,
+        "on_time_payments_pct": 95.6,
+        "current_credit_score": 655
+      },
+      {
+        "id": "m046",
+        "initials": "IC",
+        "country": "India",
+        "avg_monthly_spend": 1345.42,
+        "savings_rate": 17.9,
+        "credit_utilization": 20.6,
+        "on_time_payments_pct": 95.1,
+        "current_credit_score": 692
+      },
+      {
+        "id": "m047",
+        "initials": "XL",
+        "country": "India",
+        "avg_monthly_spend": 1227.35,
+        "savings_rate": 1.8,
+        "credit_utilization": 41.9,
+        "on_time_payments_pct": 100.0,
+        "current_credit_score": 658
+      }
+    ],
+    "userPercentiles": {
+      "creditUtil": 87,
+      "savingsRate": 70,
+      "onTimePayments": 77,
+      "creditScore": 70
+    },
+    "activeChallenge": {
+      "title": "Save $500 by Spring Break",
+      "deadline": "2026-05-15",
+      "joined": 12,
+      "total": 47,
+      "pooled": 3840,
+      "goal": 6000,
+      "userSaved": 180,
+      "userGoal": 500
+    }
+  },
+  "quests": {
+    "totalXP": 730,
+    "level": 3,
+    "levelName": "Riser",
+    "nextLevelAt": 1000,
+    "nextLevelName": "Anchor",
+    "active": [
+      {
+        "id": "q1",
+        "title": "Pay April statement by May 8",
+        "xp": 50,
+        "progress": 0.0,
+        "deadline": "2026-05-08",
+        "category": "payment"
+      },
+      {
+        "id": "q2",
+        "title": "Keep utilization under 30% this week",
+        "xp": 30,
+        "progress": 0.65,
+        "deadline": "2026-05-03",
+        "category": "utilization"
+      },
+      {
+        "id": "q3",
+        "title": "Read: How to request a credit limit increase",
+        "xp": 20,
+        "progress": 0.0,
+        "deadline": "2026-05-10",
+        "category": "education"
+      }
+    ],
+    "completed": [
+      {
+        "id": "q4",
+        "title": "Stay under 40% utilization for 30 days",
+        "xp": 100,
+        "completedOn": "2026-03-15"
+      },
+      {
+        "id": "q5",
+        "title": "Pay 6 statements on time",
+        "xp": 150,
+        "completedOn": "2026-04-01"
+      }
+    ],
+    "badges": [
+      {
+        "id": "b1",
+        "name": "First Statement",
+        "emoji": "\ud83d\udcc4",
+        "earned": true
+      },
+      {
+        "id": "b2",
+        "name": "Limit Master",
+        "emoji": "\ud83c\udfc6",
+        "earned": true
+      },
+      {
+        "id": "b3",
+        "name": "ASU Anchor",
+        "emoji": "\u2693",
+        "earned": true
+      },
+      {
+        "id": "b4",
+        "name": "Saver Bronze",
+        "emoji": "\ud83d\udcb0",
+        "earned": false
+      },
+      {
+        "id": "b5",
+        "name": "Perfect Month",
+        "emoji": "\u2b50",
+        "earned": false
+      },
+      {
+        "id": "b6",
+        "name": "Referral Star",
+        "emoji": "\ud83c\udf1f",
+        "earned": false
+      }
+    ]
+  }
+}
