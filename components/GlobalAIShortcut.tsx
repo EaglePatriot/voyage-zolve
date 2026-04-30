@@ -237,6 +237,7 @@ export function GlobalAIShortcut() {
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                       {ctx.suggestions.map(s => (
                         <button key={s} onClick={() => sendMessage(s)}
+                          className="lively-card"
                           style={{ textAlign: "left", padding: "11px 14px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(168,85,247,0.2)", color: "#d0b8ff", fontSize: 13, fontWeight: 500, cursor: "pointer" }}
                           onMouseEnter={e => (e.currentTarget.style.background = "rgba(168,85,247,0.1)")}
                           onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.03)")}>
@@ -286,6 +287,7 @@ export function GlobalAIShortcut() {
                     placeholder="Ask Zolvi anything…"
                     style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "#f0e6ff", fontSize: 13, fontWeight: 500 }} />
                   <button onClick={() => sendMessage(input)}
+                    className="premium-button"
                     style={{ width: 34, height: 34, borderRadius: "50%", background: input.trim() ? "linear-gradient(135deg,#a855f7,#e879f9)" : "rgba(255,255,255,0.06)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", flexShrink: 0 }}>
                     <Send size={14} color={input.trim() ? "#fff" : "#7a6e8e"} />
                   </button>

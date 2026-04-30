@@ -22,10 +22,10 @@ export function TabBar() {
               style={{ background: active ? "#a855f7" : "transparent", boxShadow: active ? "0 0 8px #a855f7" : "none" }} />
             <div className="p-2 rounded-xl transition-all duration-300"
               style={{ background: active ? "rgba(168,85,247,0.12)" : "transparent", boxShadow: active ? "0 0 20px rgba(168,85,247,0.15)" : "none" }}>
-              <Icon size={18} style={{ color: active ? "#a855f7" : "#5b4d6e", filter: active ? "drop-shadow(0 0 6px #a855f7)" : "none", transition: "all 0.3s ease" }} />
+              <Icon size={18} style={{ color: active ? "#a855f7" : "#5b4d6e", filter: active ? "drop-shadow(0 0 6px rgba(168,85,247,0.8))" : "none", transition: "all 0.3s ease" }} />
             </div>
             <span className="text-[9px] uppercase tracking-[0.16em] font-medium transition-all duration-300"
-              style={{ color: active ? "#a855f7" : "#5b4d6e", textShadow: active ? "0 0 12px rgba(168,85,247,0.6)" : "none" }}>
+              style={{ color: active ? "#a855f7" : "#5b4d6e", textShadow: active ? "0 0 8px rgba(168,85,247,0.6)" : "none" }}>
               {label}
             </span>
           </Link>

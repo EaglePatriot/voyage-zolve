@@ -176,6 +176,7 @@ export default function CohortPage() {
             <AnimatePresence mode="popLayout">
               {visibleActivities.map((activity, i) => (
                 <motion.div key={activity.user + activity.action}
+                  className="lively-card"
                   initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 12 }}
@@ -198,7 +199,7 @@ export default function CohortPage() {
           <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.14em", color: "#7a6e8e", fontWeight: 600, marginBottom: 12 }}>This Week&rsquo;s Leaderboard</div>
           <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, overflow: "hidden" }}>
             {LEADERBOARD.map((entry, i) => (
-              <div key={entry.rank} style={{
+              <div key={entry.rank} className="lively-card" style={{
                 display: "flex", alignItems: "center", gap: 12, padding: "12px 16px",
                 borderBottom: i < LEADERBOARD.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
                 background: entry.isUser ? "rgba(168,85,247,0.08)" : "transparent",
@@ -225,7 +226,7 @@ export default function CohortPage() {
         {/* Challenge */}
         <motion.div {...fade(0.24)} style={{ marginBottom: 24 }}>
           <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.14em", color: "#7a6e8e", fontWeight: 600, marginBottom: 12 }}>Active Challenge</div>
-          <div className="interactive-card breathing-glow" style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.1),rgba(232,121,249,0.05))", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 16, padding: 16 }}>
+          <div className="interactive-card breathing-glow breathing-card lively-card" style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.1),rgba(232,121,249,0.05))", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 16, padding: 16 }}>
             <h2 style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 22, color: "#f0e6ff", marginBottom: 6 }}>Save $200 before Spring Finals</h2>
             <p style={{ fontSize: 11, color: "#7a6e8e", marginBottom: 4, fontWeight: 500 }}>14 of 52 joined · Pool $1,840 / $4,000</p>
             <p style={{ fontSize: 11, color: "#7a6e8e", marginBottom: 14, fontWeight: 500 }}>Deadline: May 15, 2026</p>
@@ -251,7 +252,7 @@ export default function CohortPage() {
 
             {!joined ? (
               <button onClick={() => { setJoined(true); setChallengeOpen(true); }}
-                className="transition-transform duration-200 active:scale-[0.98]"
+                className="premium-button transition-transform duration-200 active:scale-[0.98]"
                 style={{ width: "100%", padding: 14, borderRadius: 14, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 14, fontWeight: 700, border: "none", cursor: "pointer", boxShadow: "0 0 20px rgba(168,85,247,0.4)" }}>
                 Join the Challenge
               </button>
@@ -291,7 +292,7 @@ export default function CohortPage() {
                   )}
                 </AnimatePresence>
                 <button onClick={logWin}
-                  className="transition-transform duration-200 active:scale-[0.98]"
+                  className="premium-button transition-transform duration-200 active:scale-[0.98]"
                   style={{ width: "100%", padding: 14, borderRadius: 14, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 14, fontWeight: 700, border: "none", cursor: "pointer" }}>
                   Log a Win Today
                 </button>

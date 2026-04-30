@@ -89,7 +89,7 @@ export default function QuestPage() {
             <span>{totalXP} XP</span>
             <span>Next: Builder — {nextLevel - totalXP} XP to go</span>
           </div>
-          <div style={{ height: 8, borderRadius: 4, background: "rgba(255,255,255,0.06)", overflow: "hidden", marginBottom: 24 }}>
+          <div className="breathing-card" style={{ height: 8, borderRadius: 4, background: "rgba(255,255,255,0.06)", overflow: "hidden", marginBottom: 24 }}>
             <motion.div initial={{ width: 0 }} animate={{ width: `${progress * 100}%` }} transition={{ duration: 1, ease }}
               style={{ height: "100%", borderRadius: 4, background: "linear-gradient(90deg,#7c3aed,#a855f7,#e879f9)", position: "relative" }}>
               <div style={{ position: "absolute", right: 0, top: "50%", transform: "translate(50%,-50%)", width: 12, height: 12, borderRadius: "50%", background: "#e879f9", boxShadow: "0 0 8px #e879f9" }} />
@@ -103,7 +103,7 @@ export default function QuestPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
             {ACTIVE_QUESTS.map((q, i) => (
               <motion.div key={q.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.08 }}>
-                <div className="interactive-card" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${started.includes(q.id) ? "rgba(168,85,247,0.4)" : "rgba(255,255,255,0.07)"}`, borderRadius: 16, padding: "14px 16px" }}>
+                <div className="interactive-card lively-card" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${started.includes(q.id) ? "rgba(168,85,247,0.4)" : "rgba(255,255,255,0.07)"}`, borderRadius: 16, padding: "14px 16px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                     <span style={{ fontSize: 10, color: "#7a6e8e", fontWeight: 500 }}>{q.deadline}</span>
                     <span style={{ fontSize: 11, fontWeight: 700, color: "#c5a3ff", background: "rgba(168,85,247,0.12)", padding: "2px 8px", borderRadius: 999 }}>+{q.xp} XP</span>
@@ -117,6 +117,7 @@ export default function QuestPage() {
                   )}
                   <div style={{ display: "flex", justifyContent: "flex-end" }}>
                     <button onClick={() => openQuest(q)}
+                      className="premium-button"
                       style={{
                         fontSize: 12, fontWeight: 600, padding: "6px 14px", borderRadius: 8,
                         background: started.includes(q.id) ? "rgba(74,222,128,0.15)" : "rgba(168,85,247,0.15)",

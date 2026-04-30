@@ -334,7 +334,7 @@ export default function VoyageHome() {
           </span>
           <span style={{ fontSize: 10, color: "#7a6e8e", textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 500 }}>in your US journey</span>
         </div>
-        <h1 style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 48, lineHeight: 0.95, color: "#f0e6ff", textShadow: "0 0 40px rgba(168,85,247,0.3)", marginBottom: 8 }}>
+        <h1 className="glow-text" style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 48, lineHeight: 0.95, color: "#f0e6ff", textShadow: "0 0 40px rgba(168,85,247,0.3)", marginBottom: 8 }}>
           {displayUser.stage}
         </h1>
         <div style={{ height: 1, width: "75%", background: "linear-gradient(90deg,#a855f7,#e879f9,transparent)", marginBottom: 20 }} />
@@ -353,8 +353,8 @@ export default function VoyageHome() {
       <div className="px-6 space-y-4">
         {/* Buddy card */}
         <motion.div {...fade(0.16)} className="float-c">
-          <div className="relative rounded-2xl p-5 interactive-card breathing-glow"
-            style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.08),rgba(232,121,249,0.04))", border: "1px solid rgba(168,85,247,0.2)" }}>
+          <div className="relative rounded-2xl p-5 interactive-card breathing-glow breathing-card"
+            style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.08),rgba(232,121,249,0.04))", border: "1px solid rgba(168,85,247,0.2)", boxShadow: "0 0 40px -12px rgba(168,85,247,0.4), inset 0 1px 0 rgba(255,255,255,0.06)" }}>
             <div style={{ position: "absolute", inset: 0, borderRadius: 16, background: "linear-gradient(135deg,rgba(255,255,255,0.06),transparent 50%)", pointerEvents: "none" }} />
             <div className="flex items-start gap-4 relative">
               <div className="relative w-12 h-12 shrink-0">
@@ -374,12 +374,12 @@ export default function VoyageHome() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => openPanel("buddy", "my credit utilization is at 62% and i know thats bad — what are the fastest ways to bring it down this week?")}
-                    className="transition-all duration-300 hover:scale-105 active:scale-95"
+                    className="premium-button transition-all duration-300 hover:scale-105 active:scale-95"
                     style={{ padding: "8px 16px", borderRadius: 999, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 12, fontWeight: 600, animation: "breathingGlow 3s ease-in-out infinite" }}>
                     Walk me through
                   </button>
                   <button onClick={() => showToast("We'll remind you tomorrow")}
-                    className="transition-all duration-300 hover:scale-105 active:scale-95"
+                    className="premium-button transition-all duration-300 hover:scale-105 active:scale-95"
                     style={{ padding: "8px 16px", borderRadius: 999, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#c2b3d9", fontSize: 12, fontWeight: 500 }}>
                     Later
                   </button>
@@ -399,7 +399,7 @@ export default function VoyageHome() {
               { icon: Send, top: "Send", bottom: "Home", color: "#38bdf8", onClick: () => { setSendSuccess(false); openPanel("sendHome"); } },
             ].map(({ icon: Icon, top, bottom, color, onClick }) => (
               <button key={top} onClick={onClick}
-                className="interactive-card flex flex-col items-center gap-2 rounded-2xl py-4 px-2"
+                className="interactive-card lively-card flex flex-col items-center gap-2 rounded-2xl py-4 px-2"
                 style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = `0 0 20px ${color}33`; el.style.borderColor = `${color}44`; }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = "none"; el.style.borderColor = "rgba(255,255,255,0.06)"; }}>
@@ -416,8 +416,8 @@ export default function VoyageHome() {
         {/* Cohort */}
         <motion.div {...fade(0.32)} className="float-c2">
           <button onClick={() => router.push("/cohort")}
-            className="interactive-card relative rounded-2xl p-5 w-full text-left"
-            style={{ background: "linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))", border: "1px solid rgba(255,255,255,0.07)" }}>
+            className="interactive-card lively-card relative rounded-2xl p-5 w-full text-left"
+            style={{ background: "linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))", border: "1px solid rgba(168,85,247,0.15)" }}>
             <div className="relative">
               <div className="flex items-start justify-between mb-4">
                 <div>
@@ -443,7 +443,7 @@ export default function VoyageHome() {
 
         {/* Insight */}
         <motion.div {...fade(0.4)}>
-          <div className="interactive-card relative rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+          <div className="interactive-card lively-card relative rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(251,146,60,0.15)" }}>
             <div className="flex items-start gap-3">
               <AlertCircle size={15} style={{ color: "#fb923c", flexShrink: 0, marginTop: 2 }} />
               <div className="flex-1 min-w-0">
@@ -470,7 +470,7 @@ export default function VoyageHome() {
         {/* Recent transactions */}
         <motion.div {...fade(0.48)}>
           <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.2em", color: "#7a6e8e", marginBottom: 12, fontWeight: 600 }}>Recent</div>
-          <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+          <div className="lively-card rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
             {transactions.length > 0 ? transactions.map((tx, i) => (
               <div key={tx.id} className="flex items-center justify-between px-4 py-3"
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(168,85,247,0.2)"; }}

@@ -166,8 +166,8 @@ export function BuddySheet({
                   style={{ transition: "transform 200ms ease, box-shadow 200ms ease" }}
                   className={
                     m.role === "user"
-                      ? "ml-auto max-w-[80%] bg-[var(--color-teal-deep)] text-stone-100 rounded-2xl rounded-tr-sm px-4 py-2 text-sm"
-                      : "mr-auto max-w-[85%] bg-[var(--color-surface-2)] text-stone-100 rounded-2xl rounded-tl-sm px-4 py-3 font-serif italic text-[15px] leading-snug"
+                      ? "lively-card ml-auto max-w-[80%] bg-[var(--color-teal-deep)] text-stone-100 rounded-2xl rounded-tr-sm px-4 py-2 text-sm"
+                      : "lively-card mr-auto max-w-[85%] bg-[var(--color-surface-2)] text-stone-100 rounded-2xl rounded-tl-sm px-4 py-3 font-serif italic text-[15px] leading-snug"
                   }
                 >
                   {m.content}
@@ -185,7 +185,7 @@ export function BuddySheet({
                   <button
                     key={chip}
                     onClick={() => send(chip)}
-                    className="shrink-0 px-3 py-1.5 rounded-full border border-[var(--color-edge)]
+                    className="lively-card shrink-0 px-3 py-1.5 rounded-full border border-[var(--color-edge)]
                                text-stone-300 text-xs hover:bg-[var(--color-surface-2)]
                                hover:border-[var(--color-teal)]/40 transition-colors"
                   >
@@ -215,7 +215,7 @@ export function BuddySheet({
               <button
                 onClick={() => send(input)}
                 disabled={!input.trim() || streaming}
-                className="shrink-0 w-10 h-10 rounded-full bg-[var(--color-teal)]
+                className="premium-button shrink-0 w-10 h-10 rounded-full bg-[var(--color-teal)]
                            text-[var(--color-canvas)] flex items-center justify-center
                            disabled:opacity-40 disabled:cursor-not-allowed
                            hover:bg-[var(--color-cream)] active:scale-95 transition-all"

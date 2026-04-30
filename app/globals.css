@@ -95,3 +95,49 @@
   .breathing-glow { animation: none; }
   .interactive-card { transition: none; }
 }
+
+.lively-card {
+  position: relative;
+  transition: transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
+  will-change: transform;
+}
+.lively-card:hover {
+  transform: translateY(-3px) scale(1.012);
+  border-color: rgba(168,85,247,0.42) !important;
+  box-shadow: 0 18px 50px rgba(168,85,247,0.16), inset 0 1px 0 rgba(255,255,255,0.08) !important;
+}
+.lively-card:active {
+  transform: translateY(-1px) scale(0.985);
+}
+.breathing-card {
+  animation: breatheGlow 4.5s ease-in-out infinite;
+}
+@keyframes breatheGlow {
+  0%, 100% { box-shadow: 0 0 18px rgba(168,85,247,0.10), inset 0 1px 0 rgba(255,255,255,0.06); }
+  50% { box-shadow: 0 0 34px rgba(168,85,247,0.28), inset 0 1px 0 rgba(255,255,255,0.10); }
+}
+.float-soft {
+  animation: floatSoft 5s ease-in-out infinite;
+}
+@keyframes floatSoft {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+.premium-button {
+  transition: transform 180ms ease, box-shadow 220ms ease, filter 220ms ease;
+}
+.premium-button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow: 0 14px 36px rgba(168,85,247,0.32) !important;
+}
+.premium-button:active {
+  transform: scale(0.97);
+}
+.glow-text {
+  text-shadow: 0 0 24px rgba(168,85,247,0.28);
+}
+@media (prefers-reduced-motion: reduce) {
+  .breathing-card, .float-soft { animation: none; }
+  .lively-card, .premium-button { transition: none; }
+}

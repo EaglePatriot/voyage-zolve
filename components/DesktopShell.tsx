@@ -99,6 +99,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
           >
             Your US financial journey,{" "}
             <span
+              className="glow-text"
               style={{
                 background: "linear-gradient(135deg, #a855f7, #e879f9, #38bdf8)",
                 WebkitBackgroundClip: "text",
@@ -177,7 +178,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
           className="hidden lg:flex flex-col gap-6 max-w-[320px] justify-self-start"
         >
           <div
-            className="rounded-2xl p-5"
+            className="breathing-card rounded-2xl p-5"
             style={{
               background: "linear-gradient(135deg, rgba(168,85,247,0.08), rgba(232,121,249,0.04))",
               border: "1px solid rgba(168,85,247,0.2)",
@@ -220,7 +221,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
                   whileHover={{ x: 4 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => router.push(s.href)}
-                  className="flex items-center justify-between rounded-xl px-4 py-3 transition-colors duration-300 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#a855f7] focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                  className="lively-card flex items-center justify-between rounded-xl px-4 py-3 transition-colors duration-300 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#a855f7] focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                   style={{
                     background: active ? "linear-gradient(135deg, rgba(168,85,247,0.15), rgba(232,121,249,0.06))" : "rgba(255,255,255,0.02)",
                     border: active ? "1px solid rgba(168,85,247,0.35)" : "1px solid rgba(255,255,255,0.05)",
@@ -236,7 +237,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
             })}
           </div>
 
-          <div className="rounded-2xl p-5 mt-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+          <div className="lively-card rounded-2xl p-5 mt-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
             <div style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.24em", color: "#5b4d6e", marginBottom: "12px" }}>
               Built on
             </div>
