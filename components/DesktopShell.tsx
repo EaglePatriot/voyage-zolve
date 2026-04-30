@@ -244,7 +244,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
               {[
                 { k: "52", v: "peers on the same journey" },
                 { k: "642", v: "Rishi's starting credit score" },
-                { k: "Day 87", v: "into the US journey" },},
+                { k: "Day 87", v: "into the US journey" },
               ].map((s) => (
                 <div key={s.v} className="flex items-baseline justify-between">
                   <span style={{ fontFamily: "var(--font-mono)", fontSize: "18px", color: "#e879f9", textShadow: "0 0 8px rgba(232,121,249,0.4)" }}>
