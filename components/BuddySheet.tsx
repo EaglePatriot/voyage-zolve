@@ -14,7 +14,7 @@ const SUGGESTED_CHIPS = [
 
 const WELCOME: Message = {
   role: "assistant",
-  content: "Hey Yash. What's on your mind today?",
+  content: "Hey Rishi. What's on your mind today?",
 };
 
 export function BuddySheet({

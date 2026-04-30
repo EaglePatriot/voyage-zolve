@@ -1,11 +1,10 @@
 "use client";
-import { useState } from "react";
-import { motion } from "motion/react";
-import { CreditCard, TrendingUp, Send, AlertCircle, ChevronRight, Sparkles } from "lucide-react";
-import { user, cohort, transactions } from "@/lib/world";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "motion/react";
+import { CreditCard, TrendingUp, Send, AlertCircle, ChevronRight, Sparkles, X, Check } from "lucide-react";
+import { cohort } from "@/lib/world";
 import { JourneyPath } from "@/components/primitives";
-import { BuddySheet } from "@/components/BuddySheet";
-import { quests } from "@/lib/world";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 function fade(delay = 0) {
@@ -16,96 +15,371 @@ function fade(delay = 0) {
   };
 }
 
-export default function VoyageHome() {
-  const [buddyOpen, setBuddyOpen] = useState(false);
-  const recentTx = [...transactions].slice(-3).reverse();
-  const today = new Date("2026-04-29");
-  const oneWeekAgo = new Date(today); oneWeekAgo.setDate(today.getDate() - 7);
-  const fourWeeksAgo = new Date(today); fourWeeksAgo.setDate(today.getDate() - 28);
-  const weekDining = transactions.filter(t => t.category === "Dining" && new Date(t.date) >= oneWeekAgo).reduce((s,t) => s+t.amount, 0);
-  const monthDining = transactions.filter(t => t.category === "Dining" && new Date(t.date) >= fourWeeksAgo).reduce((s,t) => s+t.amount, 0);
-  const monthlyAvgDining = monthDining / 4;
-  const diningDelta = monthlyAvgDining > 0
-  ? Math.round(((weekDining - monthlyAvgDining) / monthlyAvgDining) * 100)
-  : 0;
+const BASE = "https://voyage-zolve.vercel.app";
+
+type PanelType = "pay" | "boost" | "sendHome" | "headsUp" | "buddy" | null;
+
+type Insight = { headline: string; body: string; cta?: { label: string; action: string } | null };
+type Transaction = { id: string; date: string; amount: number; category: string; merchant: string };
+type UserData = { name: string; daysInUS: number; stage: string; creditScore: number };
+type CohortSnapshot = {
+  cohortName: string; subtitle: string; size: number;
+  userPercentiles: { creditUtil: number; savingsRate: number; onTimePayments: number; creditScore: number };
+};
+
+const COUNTRIES = [
+  { code: "IN", name: "India", currency: "INR", flag: "🇮🇳", rate: 83.12, symbol: "₹" },
+  { code: "BR", name: "Brazil", currency: "BRL", flag: "🇧🇷", rate: 4.97, symbol: "R$" },
+  { code: "PK", name: "Pakistan", currency: "PKR", flag: "🇵🇰", rate: 278.5, symbol: "₨" },
+  { code: "MX", name: "Mexico", currency: "MXN", flag: "🇲🇽", rate: 17.15, symbol: "$" },
+  { code: "PH", name: "Philippines", currency: "PHP", flag: "🇵🇭", rate: 56.4, symbol: "₱" },
+  { code: "NG", name: "Nigeria", currency: "NGN", flag: "🇳🇬", rate: 1580, symbol: "₦" },
+  { code: "BD", name: "Bangladesh", currency: "BDT", flag: "🇧🇩", rate: 109.5, symbol: "৳" },
+  { code: "CO", name: "Colombia", currency: "COP", flag: "🇨🇴", rate: 3920, symbol: "$" },
+];
+
+const PAYMENT_METHODS = [
+  { id: "apple", label: "Apple Pay", icon: "🍎" },
+  { id: "debit", label: "Debit Card", icon: "💳" },
+  { id: "ach", label: "Bank Transfer / ACH", icon: "🏦" },
+  { id: "google", label: "Google Pay", icon: "🔵" },
+  { id: "upi", label: "UPI", icon: "🇮🇳" },
+];
+
+const BOOST_OPPORTUNITIES = [
+  { title: "Use ZETA for your next grocery run", req: "Spend $40 on groceries", reward: "+$50 limit", progress: 0.3, status: "In Progress" },
+  { title: "Pay this month's statement early", req: "Pay before May 12", reward: "+$75 limit", progress: 1, status: "Ready" },
+  { title: "Keep utilization under 30%", req: "Maintain for 14 days", reward: "+$100 limit", progress: 3 / 14, status: "3 / 14 days" },
+  { title: "Make 3 on-time payments", req: "3 consecutive payments", reward: "+$150 limit", progress: 1 / 3, status: "1 / 3" },
+];
+
+// Shared bottom sheet wrapper — absolute positioned inside phone frame
+function Sheet({ onClose, title, children }: { onClose: () => void; title: string; children: React.ReactNode }) {
+  return (
+    <AnimatePresence>
+      {/* Overlay is the positioning parent — flex + alignItems:flex-end pushes sheet to bottom */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        onClick={onClose}
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 110,
+          background: "rgba(5,0,12,0.56)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          display: "flex",
+          alignItems: "flex-end",  // ← this pushes the sheet to the bottom
+          justifyContent: "center",
+          overflow: "hidden",
+        }}
+      >
+        {/* Sheet is a CHILD of the overlay — not a sibling absolute element */}
+        <motion.div
+          initial={{ y: "100%" }}
+          animate={{ y: 0 }}
+          exit={{ y: "100%" }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          onClick={e => e.stopPropagation()}
+          style={{
+            width: "100%",
+            maxHeight: "82%",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+            borderRadius: "28px 28px 0 0",
+            background: "linear-gradient(180deg,#1a0933 0%,#0d0015 100%)",
+            border: "1px solid rgba(168,85,247,0.25)",
+            borderBottom: "none",
+            boxShadow: "0 -16px 60px rgba(168,85,247,0.2)",
+            flexShrink: 0,
+          }}
+        >
+          {/* handle */}
+          <div style={{ display: "flex", justifyContent: "center", padding: "12px 0 4px", flexShrink: 0 }}>
+            <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(168,85,247,0.4)" }} />
+          </div>
+          {/* header — single close button */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "4px 20px 12px", borderBottom: "1px solid rgba(168,85,247,0.1)", flexShrink: 0 }}>
+            <span style={{ fontSize: 17, fontWeight: 700, color: "#f0e6ff" }}>{title}</span>
+            <button
+              onClick={onClose}
+              style={{ width: 30, height: 30, borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+            >
+              <X size={14} color="#a78bbc" />
+            </button>
+          </div>
+          {/* scrollable content */}
+          <div style={{ overflowY: "auto", flex: 1, padding: "16px 20px 32px", scrollbarWidth: "none", minHeight: 0 }}>
+            {children}
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+// Buddy chat inside a Sheet
+function BuddyPanel({ initialMessage, onClose }: { initialMessage?: string; onClose: () => void }) {
+  const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([
+    { role: "assistant", content: "Hey Rishi. What's on your mind today?" }
+  ]);
+  const [input, setInput] = useState("");
+  const [streaming, setStreaming] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const initialSent = useRef(false);
+
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages]);
+
+  useEffect(() => {
+    if (initialMessage && !initialSent.current) {
+      initialSent.current = true;
+      setTimeout(() => send(initialMessage), 400);
+    }
+  }, []);
+
+  async function send(text: string) {
+    if (!text.trim() || streaming) return;
+    const userMsg = { role: "user" as const, content: text.trim() };
+    const newMsgs = [...messages, userMsg];
+    setMessages([...newMsgs, { role: "assistant", content: "" }]);
+    setInput("");
+    setStreaming(true);
+    try {
+      const res = await fetch(`${BASE}/api/buddy/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: newMsgs }),
+      });
+      if (!res.ok || !res.body) throw new Error("failed");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let acc = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const events = buffer.split("\n\n");
+        buffer = events.pop() ?? "";
+        for (const event of events) {
+          if (!event.startsWith("data: ")) continue;
+          try {
+            const payload = JSON.parse(event.slice(6));
+            if (payload.type === "text") {
+              acc += payload.delta;
+              setMessages(prev => {
+                const copy = [...prev];
+                copy[copy.length - 1] = { role: "assistant", content: acc };
+                return copy;
+              });
+            }
+          } catch { /* skip */ }
+        }
+      }
+    } catch {
+      setMessages(prev => {
+        const copy = [...prev];
+        copy[copy.length - 1] = { role: "assistant", content: "Zolvi hit a snag. Try again in a sec." };
+        return copy;
+      });
+    } finally {
+      setStreaming(false);
+    }
+  }
 
   return (
-    <main className="flex flex-col flex-1 overflow-y-auto pb-28">
+    <>
+      <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 10, scrollbarWidth: "none", marginBottom: 12 }}>
+        {messages.map((m, i) => (
+          <div key={i} style={{
+            alignSelf: m.role === "user" ? "flex-end" : "flex-start",
+            maxWidth: "85%", padding: "10px 14px",
+            borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
+            background: m.role === "user" ? "linear-gradient(135deg,#a855f7,#e879f9)" : "rgba(255,255,255,0.05)",
+            border: m.role === "assistant" ? "1px solid rgba(168,85,247,0.15)" : "none",
+            fontSize: 13, fontStyle: m.role === "assistant" ? "italic" : "normal",
+            fontFamily: m.role === "assistant" ? "var(--font-serif)" : "inherit",
+            color: "#f0e6ff", lineHeight: 1.5,
+          }}>
+            {m.content}
+            {streaming && i === messages.length - 1 && m.role === "assistant" && (
+              <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.8, repeat: Infinity }}
+                style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "#a855f7", marginLeft: 4, verticalAlign: "middle" }} />
+            )}
+          </div>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(168,85,247,0.2)", borderRadius: 14, padding: "8px 8px 8px 14px", flexShrink: 0 }}>
+        <input value={input} onChange={e => setInput(e.target.value)}
+          onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); send(input); } }}
+          placeholder="Ask Zolvi anything…"
+          style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "#f0e6ff", fontSize: 13, fontWeight: 500 }} />
+        <button onClick={() => send(input)} disabled={!input.trim() || streaming}
+          style={{ width: 34, height: 34, borderRadius: "50%", background: input.trim() ? "linear-gradient(135deg,#a855f7,#e879f9)" : "rgba(255,255,255,0.06)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Send size={14} color={input.trim() ? "#fff" : "#7a6e8e"} />
+        </button>
+      </div>
+    </>
+  );
+}
+
+export default function VoyageHome() {
+  const [activePanel, setActivePanel] = useState<PanelType>(null);
+  const [buddyInitialMsg, setBuddyInitialMsg] = useState<string | undefined>();
+  const [toast, setToast] = useState<string | null>(null);
+  const [insight, setInsight] = useState<Insight | null>(null);
+  const [insightLoading, setInsightLoading] = useState(true);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [cohortData, setCohortData] = useState<CohortSnapshot | null>(null);
+  const [selectedPayment, setSelectedPayment] = useState("apple");
+  const [paySuccess, setPaySuccess] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]);
+  const [sendAmount, setSendAmount] = useState("100");
+  const [sendSuccess, setSendSuccess] = useState(false);
+  const insightFetched = useRef(false);
+  const router = useRouter();
+
+  function showToast(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2400);
+  }
+
+  function openPanel(panel: PanelType, buddyMsg?: string) {
+    setActivePanel(panel);
+    if (buddyMsg) setBuddyInitialMsg(buddyMsg);
+  }
+
+  function closePanel() {
+    setActivePanel(null);
+    setBuddyInitialMsg(undefined);
+  }
+
+  useEffect(() => {
+    fetch(`${BASE}/api/transactions/seed`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data) return;
+        setUserData(data.user);
+        const sorted = [...(data.transactions as Transaction[])]
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+          .slice(0, 3);
+        setTransactions(sorted);
+      }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch(`${BASE}/api/cohort/snapshot`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setCohortData(data); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (insightFetched.current) return;
+    insightFetched.current = true;
+    fetch(`${BASE}/api/insights/generate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scope: "daily_nudge" }),
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setInsight(data); setInsightLoading(false); })
+      .catch(() => setInsightLoading(false));
+  }, []);
+
+  const displayUser = userData ?? { name: "Rishi", daysInUS: 87, stage: "Finding My Footing", creditScore: 642 };
+  const displayCohort = cohortData ?? { cohortName: cohort.name ?? "UTD Global Freshmen '28", subtitle: cohort.subtitle ?? "Class of '28", size: cohort.size, userPercentiles: cohort.userPercentiles };
+  const fee = 2.99;
+  const sendAmountNum = parseFloat(sendAmount) || 0;
+  const recipientAmount = ((sendAmountNum - fee) * selectedCountry.rate).toFixed(0);
+
+  return (
+    <main className="flex flex-col flex-1 overflow-y-auto pb-28 relative" style={{ scrollbarWidth: "none" }}>
       <style>{`
         @keyframes spin-ring { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
         @keyframes float-card { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-4px)} }
         .spin-ring { animation: spin-ring 4s linear infinite; }
         .float-c { animation: float-card 6s ease-in-out infinite; }
         .float-c2 { animation: float-card 6s ease-in-out infinite; animation-delay: -2s; }
+        main::-webkit-scrollbar { display: none; }
       `}</style>
 
       {/* Top bar */}
-      <motion.header {...fade(0)} className="flex items-center justify-between px-6 pt-7 pb-2">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full" style={{ background:"#a855f7", boxShadow:"0 0 8px #a855f7, 0 0 16px rgba(168,85,247,0.5)" }} />
-          <span style={{ fontSize:"11px", textTransform:"uppercase", letterSpacing:"0.24em", color:"#a78bbc", fontWeight:500 }}>Voyage</span>
+      <motion.header {...fade(0)} className="flex items-center justify-between px-6 pt-8 pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="w-2 h-2 rounded-full" style={{ background: "#a855f7", boxShadow: "0 0 10px #a855f7" }} />
+          <span style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.28em", color: "#c2b3d9", fontWeight: 600 }}>ZETA</span>
         </div>
-        <div className="w-9 h-9 rounded-full flex items-center justify-center"
-          style={{ background:"linear-gradient(135deg,rgba(168,85,247,0.2),rgba(232,121,249,0.1))", border:"1px solid rgba(168,85,247,0.3)", boxShadow:"0 0 16px rgba(168,85,247,0.2)" }}>
-          <span style={{ fontSize:"14px", fontWeight:600, color:"#e879f9" }}>{user.initials}</span>
-        </div>
+        <button className="w-10 h-10 rounded-full flex items-center justify-center"
+          style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.25),rgba(232,121,249,0.12))", border: "1px solid rgba(168,85,247,0.4)" }}>
+          <span style={{ fontSize: 14, fontWeight: 700, color: "#f0e6ff" }}>{displayUser.name?.[0] ?? "R"}</span>
+        </button>
       </motion.header>
 
+      <div className="mx-6" style={{ height: 1, background: "linear-gradient(90deg,transparent,rgba(168,85,247,0.18),transparent)" }} />
+
       {/* Stage banner */}
-      <motion.section {...fade(0.08)} className="px-6 pt-8 pb-6">
+      <motion.section {...fade(0.08)} className="px-6 pt-6 pb-5">
         <div className="flex items-center gap-2 mb-3">
-          <span style={{ fontSize:"10px", padding:"2px 8px", borderRadius:"999px", background:"rgba(168,85,247,0.1)", border:"1px solid rgba(168,85,247,0.3)", color:"#a855f7", fontWeight:500 }}>
-            Day {user.daysInUS}
+          <span style={{ fontSize: 10, padding: "3px 9px", borderRadius: 999, background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.32)", color: "#c5a3ff", fontWeight: 600 }}>
+            Day {displayUser.daysInUS}
           </span>
-          <span style={{ fontSize:"10px", color:"#5b4d6e", textTransform:"uppercase", letterSpacing:"0.1em" }}>in your US journey</span>
+          <span style={{ fontSize: 10, color: "#7a6e8e", textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 500 }}>in your US journey</span>
         </div>
-        <h1 style={{ fontFamily:"var(--font-serif)", fontStyle:"italic", fontSize:"52px", lineHeight:0.95, color:"#f0e6ff", textShadow:"0 0 40px rgba(168,85,247,0.3), 0 0 80px rgba(168,85,247,0.15)", marginBottom:"8px" }}>
-          {user.stage}
+        <h1 style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 48, lineHeight: 0.95, color: "#f0e6ff", textShadow: "0 0 40px rgba(168,85,247,0.3)", marginBottom: 8 }}>
+          {displayUser.stage}
         </h1>
-        <div style={{ height:"1px", width:"75%", background:"linear-gradient(90deg,#a855f7,#e879f9,transparent)", boxShadow:"0 0 8px rgba(168,85,247,0.4)", marginBottom:"24px" }} />
+        <div style={{ height: 1, width: "75%", background: "linear-gradient(90deg,#a855f7,#e879f9,transparent)", marginBottom: 20 }} />
         <div className="relative mb-2">
           <JourneyPath />
           <div className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full"
-            style={{ left:`${user.stageProgress*100}%`, background:"radial-gradient(circle,#e879f9,#a855f7)", boxShadow:"0 0 16px #a855f7, 0 0 32px rgba(168,85,247,0.5)" }} />
+            style={{ left: "65%", background: "radial-gradient(circle,#e879f9,#a855f7)", boxShadow: "0 0 16px #a855f7" }} />
         </div>
-        <div className="flex justify-between" style={{ fontSize:"10px", color:"#5b4d6e" }}>
+        <div className="flex justify-between" style={{ fontSize: 10, color: "#7a6e8e", fontWeight: 500 }}>
           <span>Arrival</span>
-          <span style={{ color:"#e879f9", textShadow:"0 0 8px rgba(232,121,249,0.5)" }}>You</span>
-          <span>{user.nextStage}</span>
+          <span style={{ color: "#e879f9", fontWeight: 600 }}>You</span>
+          <span>Financial Freedom</span>
         </div>
       </motion.section>
 
       <div className="px-6 space-y-4">
-
         {/* Buddy card */}
         <motion.div {...fade(0.16)} className="float-c">
           <div className="relative rounded-2xl p-5"
-            style={{ background:"linear-gradient(135deg,rgba(168,85,247,0.08),rgba(232,121,249,0.04))", border:"1px solid rgba(168,85,247,0.2)", boxShadow:"0 0 40px -12px rgba(168,85,247,0.3)" }}>
-            <div style={{ position:"absolute", inset:0, borderRadius:"16px", background:"linear-gradient(135deg,rgba(255,255,255,0.06),transparent 50%)", pointerEvents:"none" }} />
+            style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.08),rgba(232,121,249,0.04))", border: "1px solid rgba(168,85,247,0.2)", boxShadow: "0 0 40px -12px rgba(168,85,247,0.3)" }}>
+            <div style={{ position: "absolute", inset: 0, borderRadius: 16, background: "linear-gradient(135deg,rgba(255,255,255,0.06),transparent 50%)", pointerEvents: "none" }} />
             <div className="flex items-start gap-4 relative">
               <div className="relative w-12 h-12 shrink-0">
-                <div className="absolute inset-0 rounded-full spin-ring"
-                  style={{ background:"conic-gradient(from 0deg,#a855f7,#e879f9,#38bdf8,#a855f7)" }} />
-                <div className="absolute inset-[2px] rounded-full flex items-center justify-center" style={{ background:"#08001f" }}>
-                  <Sparkles size={14} style={{ color:"#e879f9", filter:"drop-shadow(0 0 4px #e879f9)" }} />
+                <div className="absolute inset-0 rounded-full spin-ring" style={{ background: "conic-gradient(from 0deg,#a855f7,#e879f9,#38bdf8,#a855f7)" }} />
+                <div className="absolute inset-[2px] rounded-full flex items-center justify-center" style={{ background: "#08001f" }}>
+                  <Sparkles size={14} style={{ color: "#e879f9", filter: "drop-shadow(0 0 4px #e879f9)" }} />
                 </div>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <span style={{ fontSize:"10px", textTransform:"uppercase", letterSpacing:"0.2em", color:"#a855f7" }}>Zolvi</span>
-                  <span style={{ fontSize:"9px", padding:"1px 6px", borderRadius:"999px", background:"rgba(168,85,247,0.1)", border:"1px solid rgba(168,85,247,0.2)", color:"#a855f7" }}>just now</span>
+                  <span style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.2em", color: "#c5a3ff", fontWeight: 600 }}>Zolvi</span>
+                  <span style={{ fontSize: 9, padding: "2px 7px", borderRadius: 999, background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.22)", color: "#c5a3ff", fontWeight: 500 }}>just now</span>
                 </div>
-                <p style={{ fontFamily:"var(--font-serif)", fontStyle:"italic", fontSize:"16px", lineHeight:1.4, color:"#f0e6ff", marginBottom:"16px" }}>
-                  "Yash — you're 8 days from your credit anniversary. Want me to walk you through requesting a limit increase?"
+                <p style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 15, lineHeight: 1.4, color: "#f0e6ff", marginBottom: 14 }}>
+                  &ldquo;{displayUser.name} — your utilization is at 62%. That&rsquo;s the #1 thing hurting your score right now. Want me to walk you through fixing it this week?&rdquo;
                 </p>
                 <div className="flex gap-2">
-                  <button onClick={() => setBuddyOpen(true)}
-                    className="transition-all duration-300 hover:scale-105"
-                    style={{ padding:"8px 16px", borderRadius:"999px", background:"linear-gradient(135deg,#a855f7,#e879f9)", color:"#fff", fontSize:"12px", fontWeight:600, boxShadow:"0 0 20px rgba(168,85,247,0.4)" }}>
+                  <button
+                    onClick={() => openPanel("buddy", "my credit utilization is at 62% and i know thats bad — what are the fastest ways to bring it down this week?")}
+                    className="transition-all duration-300 hover:scale-105 active:scale-95"
+                    style={{ padding: "8px 16px", borderRadius: 999, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 12, fontWeight: 600, boxShadow: "0 0 20px rgba(168,85,247,0.4)" }}>
                     Walk me through
                   </button>
-                  <button className="transition-all duration-300 hover:scale-105"
-                    style={{ padding:"8px 16px", borderRadius:"999px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"#a78bbc", fontSize:"12px" }}>
+                  <button onClick={() => showToast("We'll remind you tomorrow")}
+                    className="transition-all duration-300 hover:scale-105 active:scale-95"
+                    style={{ padding: "8px 16px", borderRadius: 999, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#c2b3d9", fontSize: 12, fontWeight: 500 }}>
                     Later
                   </button>
                 </div>
@@ -116,22 +390,22 @@ export default function VoyageHome() {
 
         {/* Quick actions */}
         <motion.div {...fade(0.24)}>
-          <div style={{ fontSize:"10px", textTransform:"uppercase", letterSpacing:"0.2em", color:"#5b4d6e", marginBottom:"12px" }}>Quick actions</div>
+          <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.2em", color: "#7a6e8e", marginBottom: 12, fontWeight: 600 }}>Quick actions</div>
           <div className="grid grid-cols-3 gap-2">
             {[
-              { icon: CreditCard, top:"Pay",   bottom:"April bill", color:"#a855f7" },
-              { icon: TrendingUp, top:"Boost", bottom:"Limit",      color:"#e879f9" },
-              { icon: Send,       top:"Send",  bottom:"Home",       color:"#38bdf8" },
-            ].map(({ icon: Icon, top, bottom, color }) => (
-              <button key={top}
-                className="flex flex-col items-center gap-2 rounded-2xl py-4 px-2 transition-all duration-300 hover:scale-105 active:scale-95"
-                style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.06)" }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow=`0 0 20px ${color}33`; el.style.borderColor=`${color}44`; }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow="none"; el.style.borderColor="rgba(255,255,255,0.06)"; }}>
-                <Icon size={18} style={{ color, filter:`drop-shadow(0 0 4px ${color})` }} />
+              { icon: CreditCard, top: "Pay", bottom: "April bill", color: "#a855f7", onClick: () => { setPaySuccess(false); openPanel("pay"); } },
+              { icon: TrendingUp, top: "Boost", bottom: "Limit", color: "#e879f9", onClick: () => openPanel("boost") },
+              { icon: Send, top: "Send", bottom: "Home", color: "#38bdf8", onClick: () => { setSendSuccess(false); openPanel("sendHome"); } },
+            ].map(({ icon: Icon, top, bottom, color, onClick }) => (
+              <button key={top} onClick={onClick}
+                className="flex flex-col items-center gap-2 rounded-2xl py-4 px-2 transition-all duration-200 hover:scale-105 active:scale-95"
+                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = `0 0 20px ${color}33`; el.style.borderColor = `${color}44`; }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = "none"; el.style.borderColor = "rgba(255,255,255,0.06)"; }}>
+                <Icon size={18} style={{ color, filter: `drop-shadow(0 0 4px ${color})` }} />
                 <div className="text-center">
-                  <div style={{ fontSize:"9px", textTransform:"uppercase", letterSpacing:"0.14em", color:"#5b4d6e" }}>{top}</div>
-                  <div style={{ fontSize:"12px", fontWeight:500, color:"#f0e6ff" }}>{bottom}</div>
+                  <div style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "0.14em", color: "#7a6e8e", fontWeight: 600 }}>{top}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "#f0e6ff" }}>{bottom}</div>
                 </div>
               </button>
             ))}
@@ -140,75 +414,288 @@ export default function VoyageHome() {
 
         {/* Cohort */}
         <motion.div {...fade(0.32)} className="float-c2">
-          <div className="relative rounded-2xl p-5"
-            style={{ background:"linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))", border:"1px solid rgba(255,255,255,0.07)" }}>
-            <div style={{ position:"absolute", inset:0, borderRadius:"16px", background:"linear-gradient(135deg,rgba(255,255,255,0.04),transparent 50%)", pointerEvents:"none" }} />
+          <button onClick={() => router.push("/cohort")}
+            className="relative rounded-2xl p-5 w-full text-left transition-all duration-200 hover:scale-[1.01]"
+            style={{ background: "linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))", border: "1px solid rgba(255,255,255,0.07)" }}>
             <div className="relative">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <div style={{ fontSize:"10px", textTransform:"uppercase", letterSpacing:"0.2em", color:"#5b4d6e", marginBottom:"8px" }}>Your cohort</div>
-                  <div style={{ fontFamily:"var(--font-serif)", fontStyle:"italic", fontSize:"20px", color:"#f0e6ff" }}>{cohort.name}</div>
-                  <div style={{ fontSize:"11px", color:"#5b4d6e", marginTop:"2px" }}>{cohort.subtitle} · {cohort.size} members</div>
+                  <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.2em", color: "#7a6e8e", marginBottom: 8, fontWeight: 600 }}>Your cohort</div>
+                  <div style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 20, color: "#f0e6ff" }}>{displayCohort.cohortName}</div>
+                  <div style={{ fontSize: 11, color: "#7a6e8e", marginTop: 2, fontWeight: 500 }}>{displayCohort.subtitle} · {displayCohort.size} members</div>
                 </div>
-                <ChevronRight size={16} style={{ color:"#5b4d6e" }} />
+                <ChevronRight size={16} style={{ color: "#7a6e8e" }} />
               </div>
-              <div style={{ fontSize:"10px", display:"flex", justifyContent:"space-between", marginBottom:"8px" }}>
-                <span style={{ color:"#5b4d6e" }}>Credit utilization</span>
-                <span style={{ color:"#a855f7", textShadow:"0 0 8px rgba(168,85,247,0.4)" }}>Top {100-cohort.userPercentiles.creditUtil}%</span>
+              <div style={{ fontSize: 10, display: "flex", justifyContent: "space-between", marginBottom: 8, fontWeight: 500 }}>
+                <span style={{ color: "#7a6e8e" }}>Credit utilization</span>
+                <span style={{ color: "#c5a3ff", fontWeight: 600 }}>Top {100 - displayCohort.userPercentiles.creditUtil}%</span>
               </div>
-              <div className="relative h-1.5 rounded-full" style={{ background:"rgba(255,255,255,0.05)" }}>
-                {[25,50,75].map(p => <div key={p} className="absolute top-0 bottom-0 w-px" style={{ left:`${p}%`, background:"rgba(255,255,255,0.08)" }} />)}
-                <div className="absolute top-0 left-0 h-full rounded-full"
-                  style={{ width:`${cohort.userPercentiles.creditUtil}%`, background:"linear-gradient(90deg,rgba(168,85,247,0.3),rgba(168,85,247,0.6))" }} />
-                <div className="absolute w-3 h-3 rounded-full"
-                  style={{ left:`${cohort.userPercentiles.creditUtil}%`, top:"50%", transform:"translateX(-50%) translateY(-50%)", background:"radial-gradient(circle,#e879f9,#a855f7)", boxShadow:"0 0 10px #a855f7, 0 0 20px rgba(168,85,247,0.5)" }} />
+              <div className="relative h-1.5 rounded-full" style={{ background: "rgba(255,255,255,0.05)" }}>
+                {[25, 50, 75].map(p => <div key={p} className="absolute top-0 bottom-0 w-px" style={{ left: `${p}%`, background: "rgba(255,255,255,0.08)" }} />)}
+                <div className="absolute top-0 left-0 h-full rounded-full" style={{ width: `${displayCohort.userPercentiles.creditUtil}%`, background: "linear-gradient(90deg,rgba(168,85,247,0.3),rgba(168,85,247,0.6))" }} />
+                <div className="absolute w-3 h-3 rounded-full" style={{ left: `${displayCohort.userPercentiles.creditUtil}%`, top: "50%", transform: "translateX(-50%) translateY(-50%)", background: "radial-gradient(circle,#e879f9,#a855f7)", boxShadow: "0 0 10px #a855f7" }} />
               </div>
-              <div style={{ fontSize:"11px", color:"#a855f7", marginTop:"8px" }}>Better than {cohort.userPercentiles.creditUtil}% of your cohort</div>
+              <div style={{ fontSize: 11, color: "#c5a3ff", marginTop: 8, fontWeight: 500 }}>Better than {displayCohort.userPercentiles.creditUtil}% of your cohort</div>
             </div>
-          </div>
+          </button>
         </motion.div>
 
         {/* Insight */}
-        <motion.div {...fade(0.40)}>
-          <div className="relative rounded-2xl p-4"
-            style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.05)" }}>
+        <motion.div {...fade(0.4)}>
+          <div className="relative rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
             <div className="flex items-start gap-3">
-              <AlertCircle size={15} style={{ color:"#fb923c", filter:"drop-shadow(0 0 4px #fb923c)", flexShrink:0, marginTop:"2px" }} />
-              <div className="flex-1">
-                <div style={{ fontSize:"12px", fontWeight:600, color:"#f0e6ff", marginBottom:"4px" }}>Heads up</div>
-                <div style={{ fontSize:"12px", color:"#a78bbc", lineHeight:1.5 }}>
-                  Your dining spend this week is{" "}
-                  <span style={{ color:"#fb923c", textShadow:"0 0 8px rgba(251,146,60,0.4)" }}>
-                    {Math.abs(diningDelta)}% {diningDelta > 0 ? "above" : "below"}
-                  </span>{" "}your 4-week average.
-                </div>
+              <AlertCircle size={15} style={{ color: "#fb923c", flexShrink: 0, marginTop: 2 }} />
+              <div className="flex-1 min-w-0">
+                {insightLoading ? (
+                  <div style={{ fontSize: 12, color: "#a78bbc" }}>Zolvi is reading your week…</div>
+                ) : insight ? (
+                  <>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#f0e6ff", marginBottom: 4 }}>{insight.headline}</div>
+                    <div style={{ fontSize: 12, color: "#a78bbc", lineHeight: 1.5 }}>{insight.body}</div>
+                  </>
+                ) : (
+                  <div style={{ fontSize: 12, color: "#a78bbc" }}>Your utilization is 62% — above the 30% sweet spot. This is the fastest thing you can fix to improve your score.</div>
+                )}
               </div>
-              <button style={{ fontSize:"11px", fontWeight:500, color:"#a855f7" }}>View</button>
+              <button
+                onClick={() => openPanel("headsUp")}
+                style={{ fontSize: 11, fontWeight: 600, color: "#c5a3ff", flexShrink: 0 }}>
+                View
+              </button>
             </div>
           </div>
         </motion.div>
 
         {/* Recent transactions */}
         <motion.div {...fade(0.48)}>
-          <div style={{ fontSize:"10px", textTransform:"uppercase", letterSpacing:"0.2em", color:"#5b4d6e", marginBottom:"12px" }}>Recent</div>
-          <div className="rounded-2xl overflow-hidden" style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.05)" }}>
-            {recentTx.map((tx, i) => (
+          <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.2em", color: "#7a6e8e", marginBottom: 12, fontWeight: 600 }}>Recent</div>
+          <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+            {transactions.length > 0 ? transactions.map((tx, i) => (
               <div key={tx.id} className="flex items-center justify-between px-4 py-3"
-                style={{ borderBottom: i < recentTx.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                style={{ borderBottom: i < transactions.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
                 <div>
-                  <div style={{ fontSize:"13px", fontWeight:500, color:"#f0e6ff" }}>{tx.merchant}</div>
-                  <div style={{ fontSize:"11px", color:"#5b4d6e" }}>{tx.date}</div>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: "#f0e6ff" }}>{tx.merchant}</div>
+                  <div style={{ fontSize: 11, color: "#7a6e8e", fontWeight: 500 }}>{tx.date}</div>
                 </div>
-                <div style={{ fontFamily:"var(--font-mono)", fontSize:"13px", color:"#a78bbc" }}>−${tx.amount.toFixed(2)}</div>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "#c2b3d9" }}>−${tx.amount.toFixed(2)}</div>
+              </div>
+            )) : [1, 2, 3].map(i => (
+              <div key={i} className="flex items-center justify-between px-4 py-3"
+                style={{ borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                <div style={{ height: 12, width: 120, borderRadius: 4, background: "rgba(255,255,255,0.06)" }} />
+                <div style={{ height: 12, width: 60, borderRadius: 4, background: "rgba(255,255,255,0.06)" }} />
               </div>
             ))}
           </div>
         </motion.div>
-
       </div>
 
-      {/* Buddy sheet */}
-      <BuddySheet open={buddyOpen} onClose={() => setBuddyOpen(false)} />
+      {/* Toast */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div key="toast"
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: "absolute", bottom: 100, left: "50%", transform: "translateX(-50%)",
+              background: "rgba(20,10,40,0.95)", backdropFilter: "blur(12px)",
+              border: "1px solid rgba(168,85,247,0.3)", color: "#f0e6ff",
+              fontSize: 12, fontWeight: 500, padding: "10px 18px", borderRadius: 999,
+              zIndex: 60, whiteSpace: "nowrap",
+            }}>
+            {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ALL PANELS — only one renders at a time */}
+      <AnimatePresence>
+
+        {/* PAY */}
+        {activePanel === "pay" && (
+          <Sheet key="pay" title="Pay April Balance" onClose={closePanel}>
+            {!paySuccess ? (
+              <>
+                <div style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.15),rgba(232,121,249,0.08))", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 16, padding: 20, marginBottom: 20, textAlign: "center" }}>
+                  <div style={{ fontSize: 11, color: "#7a6e8e", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.2em", marginBottom: 8 }}>Current Balance</div>
+                  <div style={{ fontSize: 40, fontWeight: 700, color: "#f0e6ff", fontFamily: "var(--font-mono)", letterSpacing: "-0.02em" }}>$312.45</div>
+                  <div style={{ fontSize: 12, color: "#fb923c", marginTop: 6, fontWeight: 500 }}>Minimum due: $38.00 by May 12</div>
+                </div>
+                <div style={{ fontSize: 11, color: "#7a6e8e", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.2em", marginBottom: 10 }}>Payment Method</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+                  {PAYMENT_METHODS.map(m => (
+                    <button key={m.id} onClick={() => setSelectedPayment(m.id)}
+                      style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 16px", borderRadius: 14, background: selectedPayment === m.id ? "rgba(168,85,247,0.12)" : "rgba(255,255,255,0.03)", border: `1px solid ${selectedPayment === m.id ? "rgba(168,85,247,0.5)" : "rgba(255,255,255,0.07)"}`, cursor: "pointer" }}>
+                      <span style={{ fontSize: 20 }}>{m.icon}</span>
+                      <span style={{ fontSize: 14, fontWeight: 500, color: "#f0e6ff", flex: 1, textAlign: "left" }}>{m.label}</span>
+                      {selectedPayment === m.id && <Check size={16} color="#a855f7" />}
+                    </button>
+                  ))}
+                </div>
+                <button onClick={() => setPaySuccess(true)}
+                  style={{ width: "100%", padding: 16, borderRadius: 16, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 15, fontWeight: 700, border: "none", cursor: "pointer" }}>
+                  Pay $312.45
+                </button>
+              </>
+            ) : (
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ textAlign: "center", padding: "32px 0" }}>
+                <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg,#a855f7,#e879f9)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+                  <Check size={28} color="#fff" />
+                </div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: "#f0e6ff", marginBottom: 8 }}>Payment Scheduled</div>
+                <div style={{ fontSize: 14, color: "#a78bbc", lineHeight: 1.6 }}>Your balance payment of $312.45 is being processed. It will reflect within 1–2 business days.</div>
+              </motion.div>
+            )}
+          </Sheet>
+        )}
+
+        {/* BOOST */}
+        {activePanel === "boost" && (
+          <Sheet key="boost" title="Boost Your Limit" onClose={closePanel}>
+            <div style={{ background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.2)", borderRadius: 16, padding: 16, marginBottom: 20 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontSize: 11, color: "#7a6e8e", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Current</div>
+                  <div style={{ fontSize: 28, fontWeight: 700, color: "#f0e6ff", fontFamily: "var(--font-mono)" }}>$500</div>
+                </div>
+                <ChevronRight size={16} color="#7a6e8e" />
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 11, color: "#7a6e8e", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Potential</div>
+                  <div style={{ fontSize: 28, fontWeight: 700, color: "#c5a3ff", fontFamily: "var(--font-mono)" }}>$650</div>
+                </div>
+              </div>
+            </div>
+            <div style={{ fontSize: 11, color: "#7a6e8e", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.2em", marginBottom: 12 }}>Opportunities</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {BOOST_OPPORTUNITIES.map((o, i) => (
+                <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: "14px 16px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#f0e6ff", flex: 1, marginRight: 8 }}>{o.title}</div>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#c5a3ff", whiteSpace: "nowrap" }}>{o.reward}</span>
+                  </div>
+                  <div style={{ fontSize: 11, color: "#7a6e8e", marginBottom: 10 }}>{o.req}</div>
+                  <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,0.06)", marginBottom: 10, overflow: "hidden" }}>
+                    <motion.div initial={{ width: 0 }} animate={{ width: `${o.progress * 100}%` }} transition={{ duration: 0.8, delay: i * 0.1 }}
+                      style={{ height: "100%", borderRadius: 2, background: o.progress >= 1 ? "linear-gradient(90deg,#4ade80,#22c55e)" : "linear-gradient(90deg,#a855f7,#e879f9)" }} />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: 11, color: o.progress >= 1 ? "#4ade80" : "#a78bbc", fontWeight: 500 }}>{o.status}</span>
+                    <button style={{ fontSize: 11, fontWeight: 600, padding: "5px 12px", borderRadius: 8, background: o.progress >= 1 ? "rgba(74,222,128,0.15)" : "rgba(168,85,247,0.15)", border: `1px solid ${o.progress >= 1 ? "rgba(74,222,128,0.3)" : "rgba(168,85,247,0.3)"}`, color: o.progress >= 1 ? "#4ade80" : "#c5a3ff", cursor: "pointer" }}>
+                      {o.progress >= 1 ? "Claim" : "Start"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Sheet>
+        )}
+
+        {/* SEND HOME */}
+        {activePanel === "sendHome" && (
+          <Sheet key="sendHome" title="Send Money Home" onClose={closePanel}>
+            {!sendSuccess ? (
+              <>
+                <div style={{ fontSize: 11, color: "#7a6e8e", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.2em", marginBottom: 10 }}>Select Destination</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20 }}>
+                  {COUNTRIES.map(c => (
+                    <button key={c.code} onClick={() => setSelectedCountry(c)}
+                      style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", borderRadius: 12, background: selectedCountry.code === c.code ? "rgba(168,85,247,0.12)" : "rgba(255,255,255,0.03)", border: `1px solid ${selectedCountry.code === c.code ? "rgba(168,85,247,0.4)" : "rgba(255,255,255,0.06)"}`, cursor: "pointer" }}>
+                      <span style={{ fontSize: 18 }}>{c.flag}</span>
+                      <div style={{ textAlign: "left" }}>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: "#f0e6ff" }}>{c.name}</div>
+                        <div style={{ fontSize: 10, color: "#7a6e8e" }}>{c.currency}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div style={{ fontSize: 11, color: "#7a6e8e", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.2em", marginBottom: 8 }}>Amount (USD)</div>
+                <input value={sendAmount} onChange={e => setSendAmount(e.target.value)} type="number"
+                  style={{ width: "100%", padding: "14px 16px", borderRadius: 14, fontSize: 24, fontWeight: 700, fontFamily: "var(--font-mono)", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(168,85,247,0.25)", color: "#f0e6ff", outline: "none", marginBottom: 16, boxSizing: "border-box" }} />
+                <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 16, marginBottom: 20 }}>
+                  {[
+                    ["Transfer fee", `$${fee.toFixed(2)}`],
+                    ["Exchange rate", `1 USD = ${selectedCountry.rate} ${selectedCountry.currency}`],
+                    ["Total charged", `$${(sendAmountNum + fee).toFixed(2)}`],
+                    ["Recipient gets", `${selectedCountry.symbol}${Number(recipientAmount).toLocaleString()}`],
+                    ["Delivery", "Within 24 hours"],
+                  ].map(([label, value]) => (
+                    <div key={label} style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                      <span style={{ fontSize: 12, color: "#7a6e8e", fontWeight: 500 }}>{label}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: label === "Recipient gets" ? "#c5a3ff" : "#f0e6ff" }}>{value}</span>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => setSendSuccess(true)}
+                  style={{ width: "100%", padding: 16, borderRadius: 16, background: "linear-gradient(135deg,#38bdf8,#0ea5e9)", color: "#fff", fontSize: 15, fontWeight: 700, border: "none", cursor: "pointer" }}>
+                  Send to Recipient {selectedCountry.flag}
+                </button>
+              </>
+            ) : (
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ textAlign: "center", padding: "32px 0" }}>
+                <div style={{ fontSize: 48, marginBottom: 16 }}>{selectedCountry.flag}</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: "#f0e6ff", marginBottom: 8 }}>Transfer Created</div>
+                <div style={{ fontSize: 14, color: "#a78bbc", lineHeight: 1.6 }}>
+                  Your recipient will receive approximately{" "}
+                  <span style={{ color: "#c5a3ff", fontWeight: 600 }}>{selectedCountry.symbol}{Number(recipientAmount).toLocaleString()} {selectedCountry.currency}</span>.
+                </div>
+              </motion.div>
+            )}
+          </Sheet>
+        )}
+
+        {/* HEADS UP */}
+        {activePanel === "headsUp" && (
+          <Sheet key="headsUp" title="Heads Up" onClose={closePanel}>
+            <div style={{ background: "rgba(251,146,60,0.08)", border: "1px solid rgba(251,146,60,0.2)", borderRadius: 14, padding: 16, marginBottom: 20 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#f0e6ff", marginBottom: 8 }}>
+                {insight?.headline ?? "Utilization is your fastest fix"}
+              </div>
+              <div style={{ fontSize: 13, color: "#c2b3d9", lineHeight: 1.6 }}>
+                {insight?.body ?? "Your utilization is 62% — above the 30% sweet spot. This is the fastest thing you can fix to improve your score."}
+              </div>
+            </div>
+            <div style={{ background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: 14, padding: 16, marginBottom: 20 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#4ade80", marginBottom: 4 }}>Nice work 🎉</div>
+              <div style={{ fontSize: 13, color: "#c2b3d9", lineHeight: 1.6 }}>You're spending less than usual this week. That's real savings adding up.</div>
+            </div>
+            <div style={{ fontSize: 11, color: "#7a6e8e", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.2em", marginBottom: 12 }}>What would you like to do?</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+              {["Show me how to fix this", "Add to my savings goal", "Ask Zolvi why"].map(action => (
+                <button key={action}
+                  onClick={() => {
+                    if (action === "Ask Zolvi why") {
+                      closePanel();
+                      setTimeout(() => openPanel("buddy", "why is my utilization at 62% considered bad? what does it actually do to my credit score?"), 100);
+                    } else if (action === "Show me how to fix this") {
+                      closePanel();
+                      setTimeout(() => openPanel("buddy", "walk me through getting my utilization from 62% down to under 30% — what do i pay and when?"), 100);
+                    } else {
+                      showToast("Savings linked to your Spring Finals challenge");
+                      closePanel();
+                    }
+                  }}
+                  style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(168,85,247,0.2)", color: "#d0b8ff", fontSize: 13, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
+                  {action}
+                </button>
+              ))}
+            </div>
+            <button onClick={closePanel}
+              style={{ width: "100%", padding: 14, borderRadius: 14, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 14, fontWeight: 700, border: "none", cursor: "pointer" }}>
+              Got it
+            </button>
+          </Sheet>
+        )}
+
+        {/* BUDDY */}
+        {activePanel === "buddy" && (
+          <Sheet key="buddy" title="Zolvi" onClose={closePanel}>
+            <BuddyPanel initialMessage={buddyInitialMsg} onClose={closePanel} />
+          </Sheet>
+        )}
+
+      </AnimatePresence>
     </main>
   );
 }

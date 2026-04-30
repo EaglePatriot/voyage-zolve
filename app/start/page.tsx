@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { Sparkles } from "lucide-react";
+import { useRef } from "react";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -28,7 +29,7 @@ export default function StartPage() {
         <div className="w-2 h-2 rounded-full"
           style={{ background:"#a855f7", boxShadow:"0 0 8px #a855f7, 0 0 16px rgba(168,85,247,0.5)" }} />
         <span style={{ fontSize:"11px", textTransform:"uppercase", letterSpacing:"0.28em", color:"#a78bbc", fontWeight:500 }}>
-          Voyage × Zolve
+          ZETA × Zolve
         </span>
       </motion.div>
 
@@ -55,7 +56,7 @@ export default function StartPage() {
             animate={{ opacity:1, y:0 }}
             transition={{ duration:0.8, ease, delay:0.35 }}
             style={{ fontFamily:"var(--font-serif)", fontStyle:"italic", fontSize:"56px", lineHeight:0.95, color:"#f0e6ff", textShadow:"0 0 40px rgba(168,85,247,0.4), 0 0 80px rgba(168,85,247,0.2)", marginBottom:"16px" }}>
-            Voyage.
+            ZETA.
           </motion.h1>
 
           {/* Animated underline */}
@@ -72,7 +73,7 @@ export default function StartPage() {
             animate={{ opacity:1 }}
             transition={{ duration:0.6, delay:0.9 }}
             style={{ fontFamily:"var(--font-serif)", fontStyle:"italic", fontSize:"16px", color:"#a78bbc", textAlign:"center" }}>
-            Your US journey, together.
+            Your US financial journey, unlocked.
           </motion.p>
         </div>
 
@@ -108,7 +109,7 @@ export default function StartPage() {
           onClick={() => router.push("/")}
           className="w-full py-4 rounded-2xl font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
           style={{ background:"linear-gradient(135deg,#a855f7,#e879f9)", color:"#fff", fontSize:"15px", boxShadow:"0 0 30px rgba(168,85,247,0.4), 0 8px 20px rgba(168,85,247,0.2)" }}>
-          Continue as Yash (demo)
+          Continue as Rishi (demo)
         </motion.button>
 
         <motion.div
@@ -116,7 +117,7 @@ export default function StartPage() {
           animate={{ opacity:1 }}
           transition={{ delay:1.5 }}
           style={{ fontSize:"10px", color:"#5b4d6e", textAlign:"center" }}>
-          Indian · ASU M.S. '26 · F-1 · Day 260
+          Indian-American · UTD Cybersecurity '28 · F-1 · Day 87
         </motion.div>
       </div>
     </main>

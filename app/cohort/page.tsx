@@ -1,9 +1,10 @@
 "use client";
-
-import { motion } from "motion/react";
-import { Users } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Users, Check, Flame } from "lucide-react";
 import { cohort } from "@/lib/world";
 import { Card } from "@/components/primitives";
+import { BottomSheet } from "@/components/BottomSheet";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 function fade(delay = 0) {
@@ -15,122 +16,207 @@ function fade(delay = 0) {
 }
 
 const METRICS = [
-  { label: "Credit utilization", percentile: 72, position: "top 28%" },
-  { label: "On-time payments", percentile: 82, position: "top 18%" },
-  { label: "Savings rate", percentile: 35, position: "bottom 35%" },
-  { label: "Spending discipline", percentile: 59, position: "top 41%" },
+  { label: "Credit utilization (lower is better)", percentile: 40, position: "bottom 40%" },
+  { label: "On-time payment rate", percentile: 82, position: "top 18%" },
+  { label: "Monthly savings rate", percentile: 35, position: "bottom 35%" },
+  { label: "Current credit score", percentile: 48, position: "top 52%" },
+];
+
+const MINI_CHALLENGES = [
+  "Skip eating out once this week — save $12",
+  "Make coffee at home for 3 days — save $9",
+  "Buy used textbooks instead of new — save $40",
+  "Cook one meal instead of ordering — save $15",
+  "Cancel one unused subscription this month",
 ];
 
 export default function CohortPage() {
-  return (
-    <main className="flex flex-col flex-1 overflow-y-auto pb-28">
-      {/* Header */}
-      <motion.section {...fade(0)} className="px-6 pt-7 pb-2">
-        <div className="text-[10px] uppercase tracking-[0.18em] text-stone-500 font-medium mb-2">
-          Your cohort
-        </div>
-        <h1 className="font-serif italic text-4xl text-stone-100 leading-[1.05] mb-2">
-          ASU Intl Grads
-        </h1>
-        <p className="text-sm text-stone-300">
-          Class of '26 · 47 members · 60% India · 20% China · 10% Brazil · 10% other
-        </p>
-      </motion.section>
+  const [joined, setJoined] = useState(false);
+  const [challengeOpen, setChallengeOpen] = useState(false);
+  const [saved, setSaved] = useState(45);
+  const [streak, setStreak] = useState(3);
+  const [rank, setRank] = useState(2);
+  const [logSuccess, setLogSuccess] = useState(false);
+  const goal = 200;
 
-      {/* Percentiles */}
-      <motion.section {...fade(0.1)} className="px-6 mt-6">
-        <div className="text-[10px] uppercase tracking-[0.14em] text-stone-500 font-medium mb-3">
-          Where you stand
+  function logWin() {
+    setSaved(prev => Math.min(prev + 8.5, goal));
+    setStreak(prev => prev + 1);
+    setRank(prev => Math.max(1, prev - 1));
+    setLogSuccess(true);
+    setTimeout(() => setLogSuccess(false), 2000);
+  }
+
+  return (
+    <main className="flex flex-col flex-1 overflow-y-auto pb-28" style={{ scrollbarWidth: "none" }}>
+      <style>{`main::-webkit-scrollbar { display: none; }`}</style>
+
+      {/* Header */}
+      <motion.header {...fade(0)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "32px 24px 8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#a855f7", boxShadow: "0 0 10px #a855f7" }} />
+          <span style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.28em", color: "#c2b3d9", fontWeight: 600 }}>Your Cohort</span>
         </div>
-        <Card>
-          <div className="space-y-5">
-            {METRICS.map((m) => (
-              <div key={m.label}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-stone-100">{m.label}</span>
-                  <span className="text-xs font-mono text-[var(--color-teal)]">
-                    {m.position}
-                  </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 999, background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.3)" }}>
+          <Users size={12} color="#c5a3ff" />
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#c5a3ff" }}>52 members</span>
+        </div>
+      </motion.header>
+
+      <div style={{ margin: "0 24px", height: 1, background: "linear-gradient(90deg,transparent,rgba(168,85,247,0.18),transparent)" }} />
+
+      <div style={{ padding: "24px 24px 0" }}>
+        {/* Title */}
+        <motion.div {...fade(0.08)} style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.2em", color: "#7a6e8e", fontWeight: 600, marginBottom: 6 }}>Your Cohort</div>
+          <h1 style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 40, lineHeight: 1, color: "#f0e6ff", marginBottom: 6 }}>UTD Global Freshmen &lsquo;28</h1>
+          <p style={{ fontSize: 12, color: "#7a6e8e", fontWeight: 500 }}>Class of &lsquo;28 · 52 members · 55% India · 20% China · 15% Latin America · 10% other</p>
+        </motion.div>
+
+        {/* Percentiles */}
+        <motion.div {...fade(0.16)} style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.14em", color: "#7a6e8e", fontWeight: 600, marginBottom: 12 }}>Where You Stand</div>
+          <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "16px 16px 8px" }}>
+            {METRICS.map((m, i) => (
+              <div key={m.label} style={{ marginBottom: i < METRICS.length - 1 ? 18 : 0 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                  <span style={{ fontSize: 12, color: "#f0e6ff", fontWeight: 500 }}>{m.label}</span>
+                  <span style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "#c5a3ff", fontWeight: 600 }}>{m.position}</span>
                 </div>
-                <div className="relative h-1.5 bg-[var(--color-edge)] rounded-full">
-                  {/* tick marks at 25/50/75 */}
-                  {[25, 50, 75].map((p) => (
-                    <div
-                      key={p}
-                      className="absolute top-1/2 -translate-y-1/2 w-px h-2 bg-stone-500/60"
-                      style={{ left: `${p}%` }}
-                    />
+                <div style={{ position: "relative", height: 6, background: "rgba(255,255,255,0.05)", borderRadius: 3 }}>
+                  {[25, 50, 75].map(p => (
+                    <div key={p} style={{ position: "absolute", top: 0, bottom: 0, width: 1, left: `${p}%`, background: "rgba(255,255,255,0.08)" }} />
                   ))}
-                  {/* user position */}
                   <motion.div
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.6, duration: 0.4, ease }}
-                    className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[var(--color-teal)]"
+                    transition={{ delay: 0.5 + i * 0.1, duration: 0.4 }}
                     style={{
+                      position: "absolute", top: "50%", width: 12, height: 12, borderRadius: "50%",
+                      background: "radial-gradient(circle,#e879f9,#a855f7)",
+                      transform: `translate(-50%, -50%)`,
                       left: `${m.percentile}%`,
-                      transform: "translate(-50%, -50%)",
-                      boxShadow: "0 0 12px rgba(77,212,172,0.7)",
+                      boxShadow: "0 0 12px rgba(168,85,247,0.7)",
                     }}
                   />
                 </div>
               </div>
             ))}
           </div>
-        </Card>
-      </motion.section>
-
-      {/* Group challenge */}
-      <motion.section {...fade(0.2)} className="px-6 mt-7">
-        <div className="text-[10px] uppercase tracking-[0.14em] text-stone-500 font-medium mb-3">
-          Active challenge
-        </div>
-        <Card glow>
-          <h2 className="font-serif italic text-2xl text-stone-100 leading-tight mb-2">
-            Save $500 by Spring Break
-          </h2>
-          <p className="text-xs text-stone-300 mb-4">
-            12 of 47 joined · Pool $3,840 / $6,000
-          </p>
-          <div className="relative h-2 bg-[var(--color-edge)] rounded-full overflow-hidden mb-4">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: "64%" }}
-              transition={{ delay: 0.5, duration: 1, ease }}
-              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-[var(--color-teal-deep)] to-[var(--color-teal)]"
-              style={{ boxShadow: "0 0 12px rgba(77,212,172,0.5)" }}
-            />
+          <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 12, background: "rgba(251,146,60,0.08)", border: "1px solid rgba(251,146,60,0.22)" }}>
+            <span style={{ fontSize: 12, color: "#fcd9b6", fontWeight: 500, lineHeight: 1.5 }}>You&rsquo;re in the bottom 40% on utilization. That&rsquo;s the #1 thing to fix.</span>
           </div>
-          <div className="flex items-center gap-1 mb-4">
-            {["AS", "RM", "PK", "JL", "CW", "DV"].map((init, i) => (
-              <div
-                key={i}
-                className="w-7 h-7 rounded-full border border-[var(--color-edge)] bg-[var(--color-surface)] flex items-center justify-center text-[10px] text-stone-300 font-medium -ml-1 first:ml-0"
-              >
-                {init}
+        </motion.div>
+
+        {/* Challenge */}
+        <motion.div {...fade(0.24)} style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.14em", color: "#7a6e8e", fontWeight: 600, marginBottom: 12 }}>Active Challenge</div>
+          <div style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.1),rgba(232,121,249,0.05))", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 16, padding: 16, boxShadow: "0 0 40px -16px rgba(168,85,247,0.4)" }}>
+            <h2 style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 22, color: "#f0e6ff", marginBottom: 6 }}>Save $200 before Spring Finals</h2>
+            <p style={{ fontSize: 11, color: "#7a6e8e", marginBottom: 4, fontWeight: 500 }}>14 of 52 joined · Pool $1,840 / $4,000</p>
+            <p style={{ fontSize: 11, color: "#7a6e8e", marginBottom: 14, fontWeight: 500 }}>Deadline: May 15, 2026</p>
+
+            {/* Progress bar */}
+            <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,0.06)", overflow: "hidden", marginBottom: 14 }}>
+              <motion.div initial={{ width: 0 }} animate={{ width: "46%" }} transition={{ delay: 0.5, duration: 1, ease }}
+                style={{ height: "100%", borderRadius: 3, background: "linear-gradient(90deg,#7c3aed,#a855f7,#e879f9)", boxShadow: "0 0 8px rgba(168,85,247,0.5)" }} />
+            </div>
+
+            {/* Avatars */}
+            <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 16 }}>
+              {["AS", "RM", "PK", "JL", "CW", "DV"].map((init, i) => (
+                <div key={i} style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 700, color: "#c5a3ff", marginLeft: i > 0 ? -6 : 0 }}>{init}</div>
+              ))}
+              <span style={{ fontSize: 11, color: "#7a6e8e", marginLeft: 8 }}>+6 more</span>
+            </div>
+
+            {/* Encouragement */}
+            <div style={{ fontSize: 12, color: "#a78bbc", lineHeight: 1.6, marginBottom: 16, fontStyle: "italic" }}>
+              &ldquo;Every dollar you save is yours to keep. Small wins compound — just like interest.&rdquo;
+            </div>
+
+            {!joined ? (
+              <button onClick={() => { setJoined(true); setChallengeOpen(true); }}
+                style={{ width: "100%", padding: 14, borderRadius: 14, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 14, fontWeight: 700, border: "none", cursor: "pointer", boxShadow: "0 0 20px rgba(168,85,247,0.4)" }}>
+                Join the Challenge
+              </button>
+            ) : (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.3)", borderRadius: 12, marginBottom: 12 }}>
+                  <Check size={16} color="#4ade80" />
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#4ade80" }}>Challenge Joined!</span>
+                </div>
+                {/* Progress card */}
+                <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 14, marginBottom: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                    <div>
+                      <div style={{ fontSize: 10, color: "#7a6e8e", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 2 }}>Saved</div>
+                      <div style={{ fontSize: 22, fontWeight: 700, color: "#f0e6ff", fontFamily: "var(--font-mono)" }}>${saved.toFixed(2)}</div>
+                      <div style={{ fontSize: 10, color: "#7a6e8e" }}>of ${goal} goal</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 4, justifyContent: "flex-end", marginBottom: 4 }}>
+                        <Flame size={12} color="#fb923c" />
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#fb923c" }}>{streak} day streak</span>
+                      </div>
+                      <div style={{ fontSize: 11, color: "#4ade80", fontWeight: 600 }}>↑ +{rank} spots this week</div>
+                    </div>
+                  </div>
+                  <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
+                    <motion.div animate={{ width: `${(saved / goal) * 100}%` }} transition={{ duration: 0.5 }}
+                      style={{ height: "100%", borderRadius: 3, background: "linear-gradient(90deg,#a855f7,#e879f9)" }} />
+                  </div>
+                </div>
+                <AnimatePresence>
+                  {logSuccess && (
+                    <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                      style={{ textAlign: "center", fontSize: 13, fontWeight: 600, color: "#4ade80", marginBottom: 8 }}>
+                      🎉 You just moved up {rank} spots!
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <button onClick={logWin}
+                  style={{ width: "100%", padding: 14, borderRadius: 14, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 14, fontWeight: 700, border: "none", cursor: "pointer" }}>
+                  Log a Win Today
+                </button>
               </div>
-            ))}
-            <div className="ml-2 text-xs text-stone-500">+6 more</div>
+            )}
           </div>
-          <button
-            className="w-full py-3 rounded-full bg-[var(--color-teal)] text-[var(--color-canvas)] text-sm font-medium hover:bg-[var(--color-cream)] transition-colors active:scale-[0.98]"
-          >
-            Join challenge
-          </button>
-        </Card>
-      </motion.section>
+        </motion.div>
 
-      {/* Recent activity */}
-      <motion.section {...fade(0.3)} className="px-6 mt-7">
-        <div className="text-[10px] uppercase tracking-[0.14em] text-stone-500 font-medium mb-3">
-          Cohort activity
+        {/* Activity */}
+        <motion.div {...fade(0.32)} style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.14em", color: "#7a6e8e", fontWeight: 600, marginBottom: 12 }}>Cohort Activity</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {[
+              "A member from India just paid their statement on time · 1h ago",
+              "Spring Finals challenge crossed 45% funded · 3h ago",
+              "New member from China joined the challenge · 6h ago",
+            ].map((a, i) => (
+              <div key={i} style={{ fontSize: 12, color: "#7a6e8e", padding: "10px 0", borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.04)" : "none", fontWeight: 500 }}>{a}</div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Challenge detail sheet */}
+      <BottomSheet open={challengeOpen} onClose={() => setChallengeOpen(false)} title="Challenge Activities">
+        <p style={{ fontSize: 14, color: "#a78bbc", lineHeight: 1.6, marginBottom: 16 }}>
+          Complete any of these activities this week. Every dollar you save stays yours.
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {MINI_CHALLENGES.map((c, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12 }}>
+              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#c5a3ff", flexShrink: 0 }}>{i + 1}</div>
+              <span style={{ fontSize: 13, color: "#f0e6ff", fontWeight: 500 }}>{c}</span>
+            </div>
+          ))}
         </div>
-        <div className="space-y-2 text-sm text-stone-500">
-          <div>Member from India just paid statement on time · 2h ago</div>
-          <div>Savings challenge crossed 60% · 5h ago</div>
-          <div>3 new members joined this week · 1d ago</div>
-        </div>
-      </motion.section>
+        <button onClick={() => setChallengeOpen(false)}
+          style={{ width: "100%", padding: 14, borderRadius: 14, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 14, fontWeight: 700, border: "none", cursor: "pointer", marginTop: 20 }}>
+          Got It — Let's Go!
+        </button>
+      </BottomSheet>
     </main>
   );
 }

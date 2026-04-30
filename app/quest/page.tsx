@@ -1,199 +1,212 @@
 "use client";
 import { useState } from "react";
-import { motion } from "motion/react";
-import { quests } from "@/lib/world";
-import { Trophy, Lock, CheckCircle, Zap } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { Trophy, CheckCircle, Zap, Lock } from "lucide-react";
+import { BottomSheet } from "@/components/BottomSheet";
+import { AIShortcut } from "@/components/AIShortcut";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 function fade(delay = 0) {
   return {
     initial: { opacity: 0, y: 14 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6, ease, delay },
+    transition: { duration: 0.7, ease, delay },
   };
 }
 
-export default function QuestPage() {
-  const [celebrated, setCelebrated] = useState<string | null>(null);
-  const xpPercent = Math.round((quests.totalXP / quests.nextLevelAt) * 100);
+const WHY_MAP: { [key: string]: string } = {
+  payment: "Payment history is 35% of your FICO score — the single biggest factor. One on-time payment moves the needle immediately.",
+  utilization: "At 62% you're in the danger zone. Getting under 30% is the fastest single thing you can do to improve your score.",
+  education: "Most international freshmen lose points on things they didn't know mattered. This takes 10 minutes and saves months.",
+};
 
-  function handleStart(id: string) {
-    setCelebrated(id);
-    setTimeout(() => setCelebrated(null), 2000);
-    if (typeof window !== "undefined") {
-      import("canvas-confetti").then(m => {
-        m.default({
-          particleCount: 60,
-          spread: 80,
-          origin: { y: 0.7 },
-          colors: ["#a855f7", "#e879f9", "#38bdf8", "#f0e6ff"],
-        });
-      });
-    }
+const ACTIVE_QUESTS = [
+  { id: "q1", title: "Pay your May statement by May 12", xp: 60, progress: 0, deadline: "Due May 12", category: "payment", why: "Payment history is 35% of your FICO score — the single biggest factor. One on-time payment moves the needle immediately." },
+  { id: "q2", title: "Bring utilization under 30% this week", xp: 80, progress: 0.2, deadline: "Due May 7", category: "utilization", why: "At 62% utilization you're losing significant points. Getting under 30% could add 40-60 points to your score within 30 days." },
+  { id: "q3", title: "Learn: How credit scores actually work", xp: 25, progress: 0, deadline: "Due May 10", category: "education", why: "Most freshmen lose points on things they don't know matter. 10 minutes here saves months of recovery." },
+];
+
+const COMPLETED = [
+  { id: "q4", title: "Set up your first US credit card", xp: 50, completedOn: "2026-02-14" },
+  { id: "q5", title: "Make your first on-time payment", xp: 75, completedOn: "2026-03-01" },
+];
+
+const BADGES = [
+  { name: "First Statement", emoji: "📄", earned: true },
+  { name: "UTD Anchor", emoji: "🎓", earned: true },
+  { name: "On-Time Starter", emoji: "⏱️", earned: true },
+  { name: "Limit Climber", emoji: "📈", earned: false },
+  { name: "Streak King", emoji: "🔥", earned: false },
+  { name: "Homesender", emoji: "🏠", earned: false },
+  { name: "30% Club", emoji: "💎", earned: false },
+  { name: "Credit Ready", emoji: "🚀", earned: false },
+];
+
+export default function QuestPage() {
+  const [started, setStarted] = useState<string[]>([]);
+  const [selectedQuest, setSelectedQuest] = useState<typeof ACTIVE_QUESTS[0] | null>(null);
+  const [questSuccess, setQuestSuccess] = useState(false);
+
+  function openQuest(q: typeof ACTIVE_QUESTS[0]) {
+    setQuestSuccess(false);
+    setSelectedQuest(q);
   }
 
+  function startQuest() {
+    if (!selectedQuest) return;
+    setStarted(prev => [...prev, selectedQuest.id]);
+    setQuestSuccess(true);
+  }
+
+  const totalXP = 340;
+  const nextLevel = 500;
+  const progress = 0.68;
+
   return (
-    <main className="flex flex-col flex-1 overflow-y-auto pb-28">
-      <style>{`
-        @keyframes xp-fill { from{width:0%} to{width:${xpPercent}%} }
-        .xp-bar { animation: xp-fill 1.2s cubic-bezier(0.22,1,0.36,1) 0.5s both; }
-      `}</style>
+    <main className="flex flex-col flex-1 overflow-y-auto pb-28" style={{ scrollbarWidth: "none" }}>
+      <style>{`main::-webkit-scrollbar { display: none; }`}</style>
 
       {/* Header */}
-      <motion.header {...fade(0)} className="flex items-center justify-between px-6 pt-7 pb-2">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full"
-            style={{ background: "#a855f7", boxShadow: "0 0 8px #a855f7" }} />
-          <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.24em", color: "#a78bbc", fontWeight: 500 }}>
-            Quest
-          </span>
+      <motion.header {...fade(0)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "32px 24px 8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#a855f7", boxShadow: "0 0 10px #a855f7" }} />
+          <span style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.28em", color: "#c2b3d9", fontWeight: 600 }}>ZETA Quests</span>
         </div>
-        <div className="flex items-center gap-1 px-3 py-1 rounded-full"
-          style={{ background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.2)" }}>
-          <Zap size={11} style={{ color: "#a855f7" }} />
-          <span style={{ fontSize: "11px", color: "#a855f7", fontWeight: 600 }}>{quests.totalXP} XP</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 999, background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.3)" }}>
+          <Zap size={12} color="#c5a3ff" />
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#c5a3ff" }}>{totalXP} XP</span>
         </div>
       </motion.header>
 
-      {/* Level banner */}
-      <motion.section {...fade(0.08)} className="px-6 pt-8 pb-6">
-        <div style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.18em", color: "#5b4d6e", marginBottom: "8px" }}>
-          Level {quests.level} of 5
-        </div>
-        <h1 style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: "52px", lineHeight: 0.95, color: "#f0e6ff", textShadow: "0 0 40px rgba(168,85,247,0.3)", marginBottom: "8px" }}>
-          {quests.levelName}
-        </h1>
-        <div style={{ height: "1px", width: "60%", background: "linear-gradient(90deg,#a855f7,#e879f9,transparent)", marginBottom: "20px" }} />
+      <div style={{ margin: "0 24px", height: 1, background: "linear-gradient(90deg,transparent,rgba(168,85,247,0.18),transparent)" }} />
 
-        {/* XP Bar */}
-        <div>
-          <div className="flex justify-between mb-2" style={{ fontSize: "10px", color: "#5b4d6e" }}>
-            <span>{quests.totalXP} XP</span>
-            <span>Next: {quests.nextLevelName} — {quests.nextLevelAt - quests.totalXP} XP to go</span>
+      <div style={{ padding: "24px 24px 0" }}>
+        {/* Level */}
+        <motion.div {...fade(0.08)}>
+          <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.2em", color: "#7a6e8e", fontWeight: 600, marginBottom: 4 }}>Level 2 of 5</div>
+          <h1 style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 44, lineHeight: 0.95, color: "#f0e6ff", marginBottom: 16 }}>Explorer</h1>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#7a6e8e", marginBottom: 6, fontWeight: 500 }}>
+            <span>{totalXP} XP</span>
+            <span>Next: Builder — {nextLevel - totalXP} XP to go</span>
           </div>
-          <div className="relative h-2 rounded-full overflow-hidden"
-            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.05)" }}>
-            <div className="xp-bar h-full rounded-full"
-              style={{ background: "linear-gradient(90deg,#7c3aed,#a855f7,#e879f9)", boxShadow: "0 0 12px rgba(168,85,247,0.6)" }} />
-            {/* Glow dot at leading edge */}
-            <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full"
-              style={{ left: `calc(${xpPercent}% - 6px)`, background: "#e879f9", boxShadow: "0 0 10px #e879f9, 0 0 20px rgba(232,121,249,0.5)" }} />
+          <div style={{ height: 8, borderRadius: 4, background: "rgba(255,255,255,0.06)", overflow: "hidden", marginBottom: 24 }}>
+            <motion.div initial={{ width: 0 }} animate={{ width: `${progress * 100}%` }} transition={{ duration: 1, ease }}
+              style={{ height: "100%", borderRadius: 4, background: "linear-gradient(90deg,#7c3aed,#a855f7,#e879f9)", position: "relative" }}>
+              <div style={{ position: "absolute", right: 0, top: "50%", transform: "translate(50%,-50%)", width: 12, height: 12, borderRadius: "50%", background: "#e879f9", boxShadow: "0 0 8px #e879f9" }} />
+            </motion.div>
           </div>
-        </div>
-      </motion.section>
-
-      <div className="px-6 space-y-5">
+        </motion.div>
 
         {/* Active quests */}
-        <motion.div {...fade(0.18)}>
-          <div style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.2em", color: "#5b4d6e", marginBottom: "12px" }}>
-            Active quests
-          </div>
-          <div className="space-y-3">
-            {quests.active.map((q, i) => (
-              <motion.div key={q.id} {...fade(0.2 + i * 0.08)}
-                className="relative rounded-2xl p-4 float-c"
-                style={{ background: "linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))", border: "1px solid rgba(255,255,255,0.07)", animationDelay: `${i * -1.5}s` }}>
-                <div style={{ position: "absolute", inset: 0, borderRadius: "16px", background: "linear-gradient(135deg,rgba(255,255,255,0.04),transparent 50%)", pointerEvents: "none" }} />
-                <div className="relative">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1 pr-3">
-                      <div style={{ fontSize: "11px", color: "#5b4d6e", marginBottom: "4px" }}>Due {q.deadline}</div>
-                      <div style={{ fontSize: "14px", fontWeight: 500, color: "#f0e6ff", lineHeight: 1.3 }}>{q.title}</div>
-                    </div>
-                    <div className="flex items-center gap-1 px-2 py-1 rounded-full shrink-0"
-                      style={{ background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.2)" }}>
-                      <Zap size={10} style={{ color: "#a855f7" }} />
-                      <span style={{ fontSize: "10px", color: "#a855f7", fontWeight: 600 }}>+{q.xp}</span>
-                    </div>
+        <motion.div {...fade(0.16)}>
+          <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.2em", color: "#7a6e8e", fontWeight: 600, marginBottom: 12 }}>Active Quests</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
+            {ACTIVE_QUESTS.map((q, i) => (
+              <motion.div key={q.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.08 }}>
+                <div style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${started.includes(q.id) ? "rgba(168,85,247,0.4)" : "rgba(255,255,255,0.07)"}`, borderRadius: 16, padding: "14px 16px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                    <span style={{ fontSize: 10, color: "#7a6e8e", fontWeight: 500 }}>{q.deadline}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#c5a3ff", background: "rgba(168,85,247,0.12)", padding: "2px 8px", borderRadius: 999 }}>+{q.xp} XP</span>
                   </div>
-
-                  {/* Progress bar */}
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "#f0e6ff", marginBottom: 10 }}>{q.title}</div>
                   {q.progress > 0 && (
-                    <div className="mb-3">
-                      <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
-                        <div className="h-full rounded-full transition-all duration-1000"
-                          style={{ width: `${q.progress * 100}%`, background: "linear-gradient(90deg,#a855f7,#e879f9)", boxShadow: "0 0 8px rgba(168,85,247,0.4)" }} />
-                      </div>
-                      <div style={{ fontSize: "10px", color: "#5b4d6e", marginTop: "4px" }}>{Math.round(q.progress * 100)}% complete</div>
+                    <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,0.06)", overflow: "hidden", marginBottom: 10 }}>
+                      <motion.div initial={{ width: 0 }} animate={{ width: `${q.progress * 100}%` }} transition={{ duration: 0.8 }}
+                        style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg,#a855f7,#e879f9)" }} />
                     </div>
                   )}
-
-                  <button
-                    onClick={() => handleStart(q.id)}
-                    className="transition-all duration-300 hover:scale-105 active:scale-95"
-                    style={{
-                      padding: "6px 16px", borderRadius: "999px", fontSize: "12px", fontWeight: 500,
-                      background: celebrated === q.id ? "linear-gradient(135deg,#a855f7,#e879f9)" : "rgba(168,85,247,0.1)",
-                      border: "1px solid rgba(168,85,247,0.25)",
-                      color: celebrated === q.id ? "#fff" : "#a855f7",
-                      boxShadow: celebrated === q.id ? "0 0 20px rgba(168,85,247,0.4)" : "none",
-                      transition: "all 0.3s ease",
-                    }}>
-                    {celebrated === q.id ? "✓ Quest accepted!" : "→ Start"}
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Completed quests */}
-        <motion.div {...fade(0.44)}>
-          <div style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.2em", color: "#5b4d6e", marginBottom: "12px" }}>
-            Completed
-          </div>
-          <div className="space-y-2">
-            {quests.completed.map((q, i) => (
-              <motion.div key={q.id} {...fade(0.46 + i * 0.06)}
-                className="flex items-center gap-3 rounded-xl px-4 py-3"
-                style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
-                <CheckCircle size={16} style={{ color: "#a855f7", filter: "drop-shadow(0 0 4px rgba(168,85,247,0.5))", flexShrink: 0 }} />
-                <div className="flex-1">
-                  <div style={{ fontSize: "13px", color: "#a78bbc", textDecoration: "line-through", textDecorationColor: "rgba(168,85,247,0.3)" }}>{q.title}</div>
-                  <div style={{ fontSize: "10px", color: "#5b4d6e" }}>Completed {q.completedOn}</div>
-                </div>
-                <div style={{ fontSize: "11px", color: "#a855f7", fontWeight: 600 }}>+{q.xp} XP</div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Badge gallery */}
-        <motion.div {...fade(0.56)}>
-          <div style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.2em", color: "#5b4d6e", marginBottom: "12px" }}>
-            Badges
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {quests.badges.map((badge, i) => (
-              <motion.div key={badge.id} {...fade(0.58 + i * 0.05)}
-                className="flex flex-col items-center gap-2 rounded-2xl p-4"
-                style={{
-                  background: badge.earned ? "linear-gradient(135deg,rgba(168,85,247,0.1),rgba(232,121,249,0.05))" : "rgba(255,255,255,0.02)",
-                  border: badge.earned ? "1px solid rgba(168,85,247,0.2)" : "1px solid rgba(255,255,255,0.04)",
-                  boxShadow: badge.earned ? "0 0 20px rgba(168,85,247,0.1)" : "none",
-                  opacity: badge.earned ? 1 : 0.4,
-                }}>
-                {badge.earned ? (
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
-                    style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.2),rgba(232,121,249,0.1))", border: "1px solid rgba(168,85,247,0.3)", boxShadow: "0 0 16px rgba(168,85,247,0.2)" }}>
-                    {badge.emoji}
+                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <button onClick={() => openQuest(q)}
+                      style={{
+                        fontSize: 12, fontWeight: 600, padding: "6px 14px", borderRadius: 8,
+                        background: started.includes(q.id) ? "rgba(74,222,128,0.15)" : "rgba(168,85,247,0.15)",
+                        border: `1px solid ${started.includes(q.id) ? "rgba(74,222,128,0.3)" : "rgba(168,85,247,0.3)"}`,
+                        color: started.includes(q.id) ? "#4ade80" : "#c5a3ff", cursor: "pointer",
+                      }}>
+                      {started.includes(q.id) ? "✓ Started" : "→ Start"}
+                    </button>
                   </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Completed */}
+        <motion.div {...fade(0.3)}>
+          <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.2em", color: "#7a6e8e", fontWeight: 600, marginBottom: 12 }}>Completed</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
+            {COMPLETED.map(q => (
+              <div key={q.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 14 }}>
+                <CheckCircle size={16} color="#4ade80" />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: "#c2b3d9" }}>{q.title}</div>
+                  <div style={{ fontSize: 10, color: "#5b4d6e", marginTop: 2 }}>Completed {q.completedOn}</div>
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#4ade80" }}>+{q.xp} XP</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Badges */}
+        <motion.div {...fade(0.4)}>
+          <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.2em", color: "#7a6e8e", fontWeight: 600, marginBottom: 12 }}>Badges</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 24 }}>
+            {BADGES.map((b, i) => (
+              <div key={i} style={{
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "16px 8px",
+                background: b.earned ? "rgba(168,85,247,0.08)" : "rgba(255,255,255,0.02)",
+                border: `1px solid ${b.earned ? "rgba(168,85,247,0.25)" : "rgba(255,255,255,0.05)"}`,
+                borderRadius: 14, opacity: b.earned ? 1 : 0.5,
+              }}>
+                {b.earned ? (
+                  <span style={{ fontSize: 28 }}>{b.emoji}</span>
                 ) : (
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center"
-                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    <Lock size={16} style={{ color: "#5b4d6e" }} />
-                  </div>
+                  <Lock size={24} color="#5b4d6e" />
                 )}
-                <div style={{ fontSize: "10px", textAlign: "center", color: badge.earned ? "#a78bbc" : "#5b4d6e", letterSpacing: "0.05em", lineHeight: 1.3 }}>
-                  {badge.name}
-                </div>
-              </motion.div>
+                <span style={{ fontSize: 10, fontWeight: 600, color: b.earned ? "#c5a3ff" : "#5b4d6e", textAlign: "center", letterSpacing: "0.05em" }}>{b.name}</span>
+              </div>
             ))}
           </div>
         </motion.div>
-
       </div>
+
+      {/* Quest detail sheet */}
+      <BottomSheet open={!!selectedQuest} onClose={() => setSelectedQuest(null)} title="Quest Details">
+        {selectedQuest && !questSuccess && (
+          <>
+            <div style={{ background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.2)", borderRadius: 16, padding: 16, marginBottom: 20 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <span style={{ fontSize: 10, color: "#7a6e8e", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.2em" }}>{selectedQuest.deadline}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#c5a3ff" }}>+{selectedQuest.xp} XP</span>
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#f0e6ff", marginBottom: 10 }}>{selectedQuest.title}</div>
+              {selectedQuest.progress > 0 && (
+                <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
+                  <div style={{ width: `${selectedQuest.progress * 100}%`, height: "100%", borderRadius: 3, background: "linear-gradient(90deg,#a855f7,#e879f9)" }} />
+                </div>
+              )}
+            </div>
+            <div style={{ fontSize: 11, color: "#7a6e8e", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.2em", marginBottom: 8 }}>Why This Matters</div>
+            <p style={{ fontSize: 14, color: "#c2b3d9", lineHeight: 1.6, marginBottom: 24 }}>{selectedQuest.why ?? WHY_MAP[selectedQuest.category]}</p>
+            <button onClick={startQuest}
+              style={{ width: "100%", padding: 16, borderRadius: 16, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 15, fontWeight: 700, border: "none", cursor: "pointer" }}>
+              {started.includes(selectedQuest.id) ? "Mark First Step Done" : "Start Quest"}
+            </button>
+          </>
+        )}
+        {questSuccess && (
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ textAlign: "center", padding: "32px 0" }}>
+            <div style={{ fontSize: 56, marginBottom: 16 }}>🎯</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: "#f0e6ff", marginBottom: 8 }}>You&rsquo;re on it.</div>
+            <div style={{ fontSize: 14, color: "#a78bbc", lineHeight: 1.6, marginBottom: 20 }}>Completing this moves your score closer to 700. <span style={{ color: "#c5a3ff", fontWeight: 600 }}>+{selectedQuest?.xp} XP</span> when done.</div>
+            <Trophy size={32} color="#a855f7" style={{ margin: "0 auto" }} />
+          </motion.div>
+        )}
+      </BottomSheet>
+
+      <AIShortcut context="quest" />
     </main>
   );
 }
