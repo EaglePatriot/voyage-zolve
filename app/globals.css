@@ -2,55 +2,28 @@
 
 @layer base {
   :root {
-    --color-canvas: #0a0e0d;
-    --color-surface: #111817;
-    --color-surface-2: #1a2322;
-    --color-edge: #1f2a28;
-    --color-teal: #4dd4ac;
-    --color-teal-deep: #1d8a6a;
-    --color-cream: #f5ecd9;
-    --color-gold: #d4a843;
-    --color-coral: #e89478;
-    --background: #0a0e0d;
-    --foreground: #f1ede4;
+    --bg-void: #03000a;
     --font-sans: "Geist", system-ui, sans-serif;
     --font-serif: "Instrument Serif", Georgia, serif;
     --font-mono: "Geist Mono", monospace;
   }
-
-  * {
-    border-color: #1f2a28;
-    box-sizing: border-box;
-  }
-
+  * { box-sizing: border-box; }
   body {
-    background-color: #0a0e0d;
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(77,212,172,0.08), transparent 60%),
-      radial-gradient(ellipse 60% 40% at 90% 110%, rgba(212,168,67,0.05), transparent 60%);
-    background-attachment: fixed;
-    color: #f1ede4;
+    background-color: #03000a;
+    color: #f0e6ff;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
-
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.035;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
-  }
-
   .journey-dots {
-    background-image: radial-gradient(circle, rgba(77,212,172,0.4) 1px, transparent 1.5px);
+    background-image: radial-gradient(circle, rgba(168,85,247,0.5) 1px, transparent 1.5px);
     background-size: 12px 12px;
   }
-
-  ::-webkit-scrollbar { width: 4px; }
+  .glass {
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+  ::-webkit-scrollbar { width: 2px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #1f2a28; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.3); border-radius: 1px; }
 }
