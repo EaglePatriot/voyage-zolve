@@ -63,11 +63,18 @@ export async function POST(req: Request) {
       messages,
     });
 
+    const stripFences = (s: string) =>
+      s.trim()
+        .replace(/^```json\s*/i, "")
+        .replace(/^```\s*/i, "")
+        .replace(/\s*```\s*$/i, "")
+        .trim();
+
     let rawText = getTextContent(firstResponse.content);
     let parsed: unknown;
 
     try {
-      parsed = JSON.parse(rawText);
+      parsed = JSON.parse(stripFences(rawText));
     } catch {
       messages.push({ role: "assistant", content: rawText });
       messages.push({ role: "user", content: InvalidJsonRetryPrompt });
@@ -80,7 +87,7 @@ export async function POST(req: Request) {
       });
 
       rawText = getTextContent(retryResponse.content);
-      parsed = JSON.parse(rawText);
+      parsed = JSON.parse(stripFences(rawText));
     }
 
     const validated = InsightSchema.parse(parsed);
