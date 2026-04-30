@@ -3,8 +3,12 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { CreditCard, TrendingUp, Send, AlertCircle, ChevronRight, Sparkles, X, Check } from "lucide-react";
-import { cohort } from "@/lib/world";
 import { JourneyPath } from "@/components/primitives";
+
+function capitalizeFirst(str: string) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 const ease = [0.22, 1, 0.36, 1] as const;
 function fade(delay = 0) {
@@ -45,6 +49,21 @@ const PAYMENT_METHODS = [
   { id: "google", label: "Google Pay", icon: "🔵" },
   { id: "upi", label: "UPI", icon: "🇮🇳" },
 ];
+
+const FALLBACK_TRANSACTIONS: Transaction[] = [
+  { id: "f1", date: "2026-04-29", amount: 21.28, category: "Transport", merchant: "Uber" },
+  { id: "f2", date: "2026-04-28", amount: 81.58, category: "Shopping", merchant: "Amazon" },
+  { id: "f3", date: "2026-04-27", amount: 17.81, category: "Food", merchant: "Dutch Bros Coffee" },
+];
+
+const FALLBACK_USER: UserData = { name: "Rishi", daysInUS: 87, stage: "Finding My Footing", creditScore: 642 };
+
+const FALLBACK_COHORT: CohortSnapshot = {
+  cohortName: "UTD Global Freshmen '28",
+  subtitle: "Class of '28",
+  size: 52,
+  userPercentiles: { creditUtil: 62, savingsRate: 30, onTimePayments: 88, creditScore: 40 },
+};
 
 const BOOST_OPPORTUNITIES = [
   { title: "Use ZETA for your next grocery run", req: "Spend $40 on groceries", reward: "+$50 limit", progress: 0.3, status: "In Progress" },
@@ -235,9 +254,9 @@ export default function VoyageHome() {
   const [toast, setToast] = useState<string | null>(null);
   const [insight, setInsight] = useState<Insight | null>(null);
   const [insightLoading, setInsightLoading] = useState(true);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [cohortData, setCohortData] = useState<CohortSnapshot | null>(null);
+  const [transactions] = useState<Transaction[]>(FALLBACK_TRANSACTIONS);
+  const [userData] = useState<UserData>(FALLBACK_USER);
+  const [cohortData] = useState<CohortSnapshot>(FALLBACK_COHORT);
   const [selectedPayment, setSelectedPayment] = useState("apple");
   const [paySuccess, setPaySuccess] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]);
@@ -262,26 +281,6 @@ export default function VoyageHome() {
   }
 
   useEffect(() => {
-    fetch(`${BASE}/api/transactions/seed`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (!data) return;
-        setUserData(data.user);
-        const sorted = [...(data.transactions as Transaction[])]
-          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-          .slice(0, 3);
-        setTransactions(sorted);
-      }).catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    fetch(`${BASE}/api/cohort/snapshot`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) setCohortData(data); })
-      .catch(() => {});
-  }, []);
-
-  useEffect(() => {
     if (insightFetched.current) return;
     insightFetched.current = true;
     fetch(`${BASE}/api/insights/generate`, {
@@ -294,14 +293,14 @@ export default function VoyageHome() {
       .catch(() => setInsightLoading(false));
   }, []);
 
-  const displayUser = userData ?? { name: "Rishi", daysInUS: 87, stage: "Finding My Footing", creditScore: 642 };
-  const displayCohort = cohortData ?? { cohortName: "UTD Global Freshmen '28", subtitle: "Class of '28", size: 52, userPercentiles: { creditUtil: 62, savingsRate: 30, onTimePayments: 88, creditScore: 40 } };
+  const displayUser = userData;
+  const displayCohort = cohortData;
   const fee = 2.99;
   const sendAmountNum = parseFloat(sendAmount) || 0;
   const recipientAmount = ((sendAmountNum - fee) * selectedCountry.rate).toFixed(0);
 
   return (
-    <main className="flex flex-col flex-1 overflow-y-auto pb-28 relative" style={{ scrollbarWidth: "none" }}>
+    <div className="flex flex-col flex-1 min-h-0 overflow-hidden relative">
       <style>{`
         @keyframes spin-ring { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
         @keyframes float-card { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-4px)} }
@@ -310,6 +309,7 @@ export default function VoyageHome() {
         .float-c2 { animation: float-card 6s ease-in-out infinite; animation-delay: -2s; }
         main::-webkit-scrollbar { display: none; }
       `}</style>
+      <main className="flex flex-col flex-1 overflow-y-auto pb-28" style={{ scrollbarWidth: "none" }}>
 
       {/* Top bar */}
       <motion.header {...fade(0)} className="flex items-center justify-between px-6 pt-8 pb-3">
@@ -450,7 +450,7 @@ export default function VoyageHome() {
                   <div style={{ fontSize: 12, color: "#a78bbc" }}>Zolvi is reading your week…</div>
                 ) : insight ? (
                   <>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#f0e6ff", marginBottom: 4 }}>{insight.headline}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#f0e6ff", marginBottom: 4 }}>{capitalizeFirst(insight.headline)}</div>
                     <div style={{ fontSize: 12, color: "#a78bbc", lineHeight: 1.5 }}>{insight.body}</div>
                   </>
                 ) : (
@@ -489,6 +489,7 @@ export default function VoyageHome() {
           </div>
         </motion.div>
       </div>
+      </main>
 
       {/* Toast */}
       <AnimatePresence>
@@ -650,7 +651,7 @@ export default function VoyageHome() {
           <Sheet key="headsUp" title="Heads Up" onClose={closePanel}>
             <div style={{ background: "rgba(251,146,60,0.08)", border: "1px solid rgba(251,146,60,0.2)", borderRadius: 14, padding: 16, marginBottom: 20 }}>
               <div style={{ fontSize: 14, fontWeight: 600, color: "#f0e6ff", marginBottom: 8 }}>
-                {insight?.headline ?? "Utilization is your fastest fix"}
+                {insight?.headline ? capitalizeFirst(insight.headline) : "Utilization is your fastest fix"}
               </div>
               <div style={{ fontSize: 13, color: "#c2b3d9", lineHeight: 1.6 }}>
                 {insight?.body ?? "Your utilization is 62% — above the 30% sweet spot. This is the fastest thing you can fix to improve your score."}
@@ -696,6 +697,6 @@ export default function VoyageHome() {
         )}
 
       </AnimatePresence>
-    </main>
+    </div>
   );
 }

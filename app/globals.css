@@ -44,3 +44,21 @@
   0%, 100% { opacity: 0.6; }
   50%       { opacity: 1; }
 }
+
+@media (max-width: 767px) {
+  .phone-frame-wrapper {
+    width: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    aspect-ratio: unset !important;
+  }
+  .dynamic-island {
+    display: none !important;
+  }
+  .phone-scroll {
+    padding-bottom: 80px !important;
+  }
+}

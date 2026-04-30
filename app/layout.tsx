@@ -39,7 +39,7 @@ export default function RootLayout({
         className="font-sans antialiased"
         style={{
           width: "100vw",
-          height: "100vh",
+          height: "100dvh",
           overflow: "hidden",
           background: "#030008",
           display: "flex",
@@ -78,11 +78,12 @@ export default function RootLayout({
         <DesktopShell>
           {/* iPhone 16 Pro Max frame */}
           <div
+            className="phone-frame-wrapper"
             style={{
               position: "relative",
               width: "min(430px, calc(100vw - 32px))",
               aspectRatio: "1320 / 2868",
-              maxHeight: "calc(100vh - 32px)",
+              maxHeight: "calc(100dvh - 32px)",
               overflow: "hidden",
               borderRadius: 46,
               border: "1px solid rgba(168,85,247,0.2)",
@@ -92,7 +93,7 @@ export default function RootLayout({
             }}
           >
             {/* Dynamic Island */}
-            <div style={{
+            <div className="dynamic-island" style={{
               position: "absolute", top: 14, left: "50%",
               transform: "translateX(-50%)",
               width: 120, height: 34,

@@ -54,8 +54,8 @@ export function DesktopShell({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="relative z-10 min-h-screen flex items-center justify-center px-3 py-4 sm:px-6 sm:py-8 lg:px-12">
-      <div className="w-full max-w-[1480px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-8 lg:gap-12 xl:gap-16 items-center">
+    <div className="relative z-10 min-h-[100dvh] flex items-center justify-center md:px-3 md:py-4 lg:px-12 lg:py-8">
+      <div className="w-full max-w-[1480px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-0 md:gap-8 lg:gap-12 xl:gap-16 items-center">
         {/* LEFT — editorial product copy (desktop only) */}
         <motion.aside
           initial={{ opacity: 0, x: -24 }}
@@ -157,10 +157,10 @@ export function DesktopShell({ children }: { children: ReactNode }) {
           initial={{ opacity: 0, y: 20, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1, ease }}
-          className="relative justify-self-center w-full max-w-[420px]"
+          className="relative justify-self-center w-full md:max-w-[420px]"
         >
           <div
-            className="absolute -inset-6 sm:-inset-8 rounded-[60px] opacity-50 pointer-events-none"
+            className="hidden md:block absolute -inset-6 sm:-inset-8 rounded-[60px] opacity-50 pointer-events-none"
             style={{
               background: "radial-gradient(ellipse at center, rgba(168,85,247,0.25), transparent 65%)",
               filter: "blur(40px)",
