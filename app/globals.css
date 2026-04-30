@@ -62,3 +62,36 @@
     padding-bottom: 80px !important;
   }
 }
+
+@keyframes breathingGlow {
+  0%, 100% { box-shadow: 0 0 18px rgba(168,85,247,0.12); }
+  50% { box-shadow: 0 0 34px rgba(168,85,247,0.32); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.breathing-glow {
+  animation: breathingGlow 4s ease-in-out infinite;
+}
+
+.interactive-card {
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.interactive-card:hover {
+  transform: translateY(-2px) scale(1.01);
+  border-color: rgba(168,85,247,0.45) !important;
+  box-shadow: 0 16px 44px rgba(168,85,247,0.18) !important;
+}
+
+.interactive-card:active {
+  transform: translateY(0) scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .breathing-glow { animation: none; }
+  .interactive-card { transition: none; }
+}

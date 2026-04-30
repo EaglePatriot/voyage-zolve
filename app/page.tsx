@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { CreditCard, TrendingUp, Send, AlertCircle, ChevronRight, Sparkles, X, Check } from "lucide-react";
+import { CreditCard, TrendingUp, Send, AlertCircle, ChevronRight, Sparkles, X, Check, Trophy, Users, Activity } from "lucide-react";
 import { JourneyPath } from "@/components/primitives";
 
 function capitalizeFirst(str: string) {
@@ -21,7 +21,7 @@ function fade(delay = 0) {
 
 const BASE = "https://voyage-zolve.vercel.app";
 
-type PanelType = "pay" | "boost" | "sendHome" | "headsUp" | "buddy" | null;
+type PanelType = "pay" | "boost" | "sendHome" | "headsUp" | "buddy" | "profile" | null;
 
 type Insight = { headline: string; body: string; cta?: { label: string; action: string } | null };
 type Transaction = { id: string; date: string; amount: number; category: string; merchant: string };
@@ -317,7 +317,8 @@ export default function VoyageHome() {
           <div className="w-2 h-2 rounded-full" style={{ background: "#a855f7", boxShadow: "0 0 10px #a855f7" }} />
           <span style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.28em", color: "#c2b3d9", fontWeight: 600 }}>ZETA</span>
         </div>
-        <button className="w-10 h-10 rounded-full flex items-center justify-center"
+        <button onClick={() => openPanel("profile")}
+          className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
           style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.25),rgba(232,121,249,0.12))", border: "1px solid rgba(168,85,247,0.4)" }}>
           <span style={{ fontSize: 14, fontWeight: 700, color: "#f0e6ff" }}>R</span>
         </button>
@@ -352,8 +353,8 @@ export default function VoyageHome() {
       <div className="px-6 space-y-4">
         {/* Buddy card */}
         <motion.div {...fade(0.16)} className="float-c">
-          <div className="relative rounded-2xl p-5"
-            style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.08),rgba(232,121,249,0.04))", border: "1px solid rgba(168,85,247,0.2)", boxShadow: "0 0 40px -12px rgba(168,85,247,0.3)" }}>
+          <div className="relative rounded-2xl p-5 interactive-card breathing-glow"
+            style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.08),rgba(232,121,249,0.04))", border: "1px solid rgba(168,85,247,0.2)" }}>
             <div style={{ position: "absolute", inset: 0, borderRadius: 16, background: "linear-gradient(135deg,rgba(255,255,255,0.06),transparent 50%)", pointerEvents: "none" }} />
             <div className="flex items-start gap-4 relative">
               <div className="relative w-12 h-12 shrink-0">
@@ -373,8 +374,8 @@ export default function VoyageHome() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => openPanel("buddy", "my credit utilization is at 62% and i know thats bad — what are the fastest ways to bring it down this week?")}
-                    className="transition-all duration-300 hover:scale-105 active:scale-95"
-                    style={{ padding: "8px 16px", borderRadius: 999, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 12, fontWeight: 600, boxShadow: "0 0 20px rgba(168,85,247,0.4)" }}>
+                    className="breathing-glow transition-all duration-300 hover:scale-105 active:scale-95"
+                    style={{ padding: "8px 16px", borderRadius: 999, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 12, fontWeight: 600 }}>
                     Walk me through
                   </button>
                   <button onClick={() => showToast("We'll remind you tomorrow")}
@@ -398,7 +399,7 @@ export default function VoyageHome() {
               { icon: Send, top: "Send", bottom: "Home", color: "#38bdf8", onClick: () => { setSendSuccess(false); openPanel("sendHome"); } },
             ].map(({ icon: Icon, top, bottom, color, onClick }) => (
               <button key={top} onClick={onClick}
-                className="flex flex-col items-center gap-2 rounded-2xl py-4 px-2 transition-all duration-200 hover:scale-105 active:scale-95"
+                className="interactive-card flex flex-col items-center gap-2 rounded-2xl py-4 px-2"
                 style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = `0 0 20px ${color}33`; el.style.borderColor = `${color}44`; }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.boxShadow = "none"; el.style.borderColor = "rgba(255,255,255,0.06)"; }}>
@@ -415,7 +416,7 @@ export default function VoyageHome() {
         {/* Cohort */}
         <motion.div {...fade(0.32)} className="float-c2">
           <button onClick={() => router.push("/cohort")}
-            className="relative rounded-2xl p-5 w-full text-left transition-all duration-200 hover:scale-[1.01]"
+            className="interactive-card relative rounded-2xl p-5 w-full text-left"
             style={{ background: "linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))", border: "1px solid rgba(255,255,255,0.07)" }}>
             <div className="relative">
               <div className="flex items-start justify-between mb-4">
@@ -442,7 +443,7 @@ export default function VoyageHome() {
 
         {/* Insight */}
         <motion.div {...fade(0.4)}>
-          <div className="relative rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+          <div className="interactive-card relative rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
             <div className="flex items-start gap-3">
               <AlertCircle size={15} style={{ color: "#fb923c", flexShrink: 0, marginTop: 2 }} />
               <div className="flex-1 min-w-0">
@@ -693,6 +694,110 @@ export default function VoyageHome() {
         {activePanel === "buddy" && (
           <Sheet key="buddy" title="Zolvi" onClose={closePanel}>
             <BuddyPanel initialMessage={buddyInitialMsg} onClose={closePanel} />
+          </Sheet>
+        )}
+
+        {/* PROFILE */}
+        {activePanel === "profile" && (
+          <Sheet key="profile" title="Your Profile" onClose={closePanel}>
+            {/* Identity header */}
+            <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+              <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg,#a855f7,#e879f9)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 24px rgba(168,85,247,0.4)", flexShrink: 0 }}>
+                <span style={{ fontSize: 28, fontWeight: 700, color: "#fff" }}>R</span>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: "#f0e6ff", marginBottom: 2 }}>Rishi</div>
+                <div style={{ fontSize: 12, color: "#a78bbc", lineHeight: 1.4 }}>UTD Cybersecurity · Freshman · F-1</div>
+              </div>
+            </div>
+
+            {/* Credit health card */}
+            <div style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.1),rgba(232,121,249,0.04))", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 16, padding: 16, marginBottom: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <CreditCard size={14} style={{ color: "#c5a3ff" }} />
+                <span style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.18em", color: "#c5a3ff", fontWeight: 600 }}>Credit health</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 6 }}>
+                <div>
+                  <div style={{ fontSize: 32, fontWeight: 700, color: "#f0e6ff", fontFamily: "var(--font-mono)", lineHeight: 1 }}>642</div>
+                  <div style={{ fontSize: 10, color: "#7a6e8e", marginTop: 4 }}>Credit score</div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: "#fb923c", fontFamily: "var(--font-mono)", lineHeight: 1 }}>62%</div>
+                  <div style={{ fontSize: 10, color: "#7a6e8e", marginTop: 4 }}>Utilization</div>
+                </div>
+              </div>
+              <div style={{ fontSize: 11, color: "#a78bbc", marginTop: 10, fontWeight: 500 }}>+0 pts this month (just starting)</div>
+            </div>
+
+            {/* Journey card */}
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 16, marginBottom: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <Activity size={14} style={{ color: "#c5a3ff" }} />
+                <span style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.18em", color: "#c5a3ff", fontWeight: 600 }}>Journey</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <div style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 18, color: "#f0e6ff" }}>Finding My Footing</div>
+                <span style={{ fontSize: 11, color: "#c5a3ff", fontWeight: 600 }}>Day 87 / 365</span>
+              </div>
+              <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
+                <motion.div initial={{ width: 0 }} animate={{ width: `${(87 / 365) * 100}%` }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg,#a855f7,#e879f9)" }} />
+              </div>
+            </div>
+
+            {/* XP card */}
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 16, marginBottom: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <Trophy size={14} style={{ color: "#c5a3ff" }} />
+                <span style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.18em", color: "#c5a3ff", fontWeight: 600 }}>Level</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <div style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 18, color: "#f0e6ff" }}>Level 2 · Explorer</div>
+                <span style={{ fontSize: 11, color: "#c5a3ff", fontWeight: 600 }}>340 / 500 XP</span>
+              </div>
+              <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
+                <motion.div initial={{ width: 0 }} animate={{ width: "68%" }} transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg,#7c3aed,#a855f7,#e879f9)" }} />
+              </div>
+            </div>
+
+            {/* Cohort card */}
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 16, marginBottom: 20 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <Users size={14} style={{ color: "#c5a3ff" }} />
+                <span style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.18em", color: "#c5a3ff", fontWeight: 600 }}>Cohort</span>
+              </div>
+              <div style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 18, color: "#f0e6ff", marginBottom: 8 }}>UTD Global Freshmen &lsquo;28</div>
+              <div style={{ display: "flex", gap: 16 }}>
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: "#f0e6ff", fontFamily: "var(--font-mono)" }}>#18</div>
+                  <div style={{ fontSize: 10, color: "#7a6e8e" }}>of 52</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: "#4ade80", fontFamily: "var(--font-mono)" }}>$45</div>
+                  <div style={{ fontSize: 10, color: "#7a6e8e" }}>saved</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action rows */}
+            <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.2em", color: "#7a6e8e", fontWeight: 600, marginBottom: 10 }}>Manage</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {[
+                { label: "View credit journey", onClick: () => showToast("Opening your credit timeline") },
+                { label: "Savings history", onClick: () => showToast("$45 saved toward Spring Finals goal") },
+                { label: "Manage cohort", onClick: () => { closePanel(); router.push("/cohort"); } },
+                { label: "Settings", onClick: () => showToast("Settings coming soon") },
+              ].map(row => (
+                <button key={row.label} onClick={row.onClick}
+                  className="interactive-card"
+                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 16px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(168,85,247,0.18)", color: "#d0b8ff", fontSize: 13, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
+                  <span>{row.label}</span>
+                  <ChevronRight size={14} style={{ color: "#7a6e8e" }} />
+                </button>
+              ))}
+            </div>
           </Sheet>
         )}
 

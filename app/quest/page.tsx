@@ -103,7 +103,7 @@ export default function QuestPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
             {ACTIVE_QUESTS.map((q, i) => (
               <motion.div key={q.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.08 }}>
-                <div style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${started.includes(q.id) ? "rgba(168,85,247,0.4)" : "rgba(255,255,255,0.07)"}`, borderRadius: 16, padding: "14px 16px" }}>
+                <div className="interactive-card" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${started.includes(q.id) ? "rgba(168,85,247,0.4)" : "rgba(255,255,255,0.07)"}`, borderRadius: 16, padding: "14px 16px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                     <span style={{ fontSize: 10, color: "#7a6e8e", fontWeight: 500 }}>{q.deadline}</span>
                     <span style={{ fontSize: 11, fontWeight: 700, color: "#c5a3ff", background: "rgba(168,85,247,0.12)", padding: "2px 8px", borderRadius: 999 }}>+{q.xp} XP</span>

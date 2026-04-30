@@ -1,10 +1,30 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Users, Check, Flame } from "lucide-react";
 import { cohort } from "@/lib/world";
 import { Card } from "@/components/primitives";
 import { BottomSheet } from "@/components/BottomSheet";
+
+type LiveActivity = { user: string; action: string; time: string; emoji: string };
+
+const LIVE_ACTIVITIES: LiveActivity[] = [
+  { user: "Maya", action: "saved $5 skipping her morning coffee", time: "just now", emoji: "☕" },
+  { user: "Alex", action: "joined the 7-day savings streak", time: "1 min ago", emoji: "🔥" },
+  { user: "Rina", action: "moved up 2 spots in the cohort", time: "3 min ago", emoji: "⬆️" },
+  { user: "Carlos", action: "completed today's no-spend challenge", time: "5 min ago", emoji: "✅" },
+  { user: "Priya", action: "added $8.25 to savings", time: "7 min ago", emoji: "💰" },
+  { user: "James", action: "paid his statement 3 days early", time: "12 min ago", emoji: "📅" },
+  { user: "Aisha", action: "hit 30% utilization for the first time", time: "18 min ago", emoji: "🎯" },
+];
+
+const LEADERBOARD = [
+  { rank: 1, initial: "P", saved: "$67.50", streak: 8, isUser: false },
+  { rank: 2, initial: "M", saved: "$54.00", streak: 6, isUser: false },
+  { rank: 3, initial: "A", saved: "$48.75", streak: 5, isUser: false },
+  { rank: 4, initial: "R", saved: "$45.00", streak: 4, isUser: true },
+  { rank: 5, initial: "C", saved: "$38.25", streak: 3, isUser: false },
+];
 
 const ease = [0.22, 1, 0.36, 1] as const;
 function fade(delay = 0) {
@@ -37,7 +57,26 @@ export default function CohortPage() {
   const [streak, setStreak] = useState(3);
   const [rank, setRank] = useState(2);
   const [logSuccess, setLogSuccess] = useState(false);
+  const [visibleActivities, setVisibleActivities] = useState<LiveActivity[]>(LIVE_ACTIVITIES.slice(0, 4));
+  const [activeNow] = useState(12);
   const goal = 200;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisibleActivities(prev => {
+        const all = LIVE_ACTIVITIES;
+        const currentFirst = all.indexOf(prev[0]);
+        const nextStart = (currentFirst + 1) % all.length;
+        return [
+          all[nextStart % all.length],
+          all[(nextStart + 1) % all.length],
+          all[(nextStart + 2) % all.length],
+          all[(nextStart + 3) % all.length],
+        ];
+      });
+    }, 6000);
+    return () => clearInterval(interval);
+  }, []);
 
   function logWin() {
     setSaved(prev => Math.min(prev + 8.5, goal));
@@ -108,10 +147,85 @@ export default function CohortPage() {
           </div>
         </motion.div>
 
+        {/* Live Activity */}
+        <motion.div {...fade(0.2)} style={{ marginBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+            <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.14em", color: "#7a6e8e", fontWeight: 600 }}>Live Activity</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "3px 10px", borderRadius: 999, background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.25)" }}>
+              <motion.div animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }}
+                style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80" }} />
+              <span style={{ fontSize: 10, fontWeight: 600, color: "#4ade80" }}>{activeNow} active now</span>
+            </div>
+          </div>
+
+          {/* Weekly group savings */}
+          <div style={{ background: "rgba(168,85,247,0.06)", border: "1px solid rgba(168,85,247,0.15)", borderRadius: 14, padding: "12px 16px", marginBottom: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <span style={{ fontSize: 12, color: "#c2b3d9", fontWeight: 500 }}>Together, your cohort saved this week</span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: "#f0e6ff", fontFamily: "var(--font-mono)" }}>$184.50</span>
+            </div>
+            <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
+              <motion.div initial={{ width: 0 }} animate={{ width: "37%" }} transition={{ delay: 0.8, duration: 1, ease }}
+                style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg,#a855f7,#e879f9)" }} />
+            </div>
+            <div style={{ fontSize: 10, color: "#7a6e8e", marginTop: 6 }}>$184.50 of $500 weekly group goal</div>
+          </div>
+
+          {/* Activity feed */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <AnimatePresence mode="popLayout">
+              {visibleActivities.map((activity, i) => (
+                <motion.div key={activity.user + activity.action}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 12 }}
+                  transition={{ duration: 0.3, delay: i * 0.05 }}
+                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 12 }}>
+                  <span style={{ fontSize: 16, flexShrink: 0 }}>{activity.emoji}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: "#f0e6ff" }}>{activity.user} </span>
+                    <span style={{ fontSize: 12, color: "#a78bbc" }}>{activity.action}</span>
+                  </div>
+                  <span style={{ fontSize: 10, color: "#5b4d6e", flexShrink: 0 }}>{activity.time}</span>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+
+        {/* Leaderboard */}
+        <motion.div {...fade(0.28)} style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.14em", color: "#7a6e8e", fontWeight: 600, marginBottom: 12 }}>This Week&rsquo;s Leaderboard</div>
+          <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, overflow: "hidden" }}>
+            {LEADERBOARD.map((entry, i) => (
+              <div key={entry.rank} style={{
+                display: "flex", alignItems: "center", gap: 12, padding: "12px 16px",
+                borderBottom: i < LEADERBOARD.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                background: entry.isUser ? "rgba(168,85,247,0.08)" : "transparent",
+              }}>
+                <div style={{ width: 24, textAlign: "center", fontSize: 12, fontWeight: 700, color: entry.rank <= 3 ? "#e879f9" : "#7a6e8e" }}>
+                  {entry.rank === 1 ? "🥇" : entry.rank === 2 ? "🥈" : entry.rank === 3 ? "🥉" : `#${entry.rank}`}
+                </div>
+                <div style={{ width: 28, height: 28, borderRadius: "50%", background: entry.isUser ? "linear-gradient(135deg,#a855f7,#e879f9)" : "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#f0e6ff" }}>
+                  {entry.initial}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: entry.isUser ? 700 : 500, color: entry.isUser ? "#f0e6ff" : "#c2b3d9" }}>
+                    {entry.isUser ? "You" : "Member"}
+                    {entry.isUser && <span style={{ fontSize: 10, color: "#c5a3ff", marginLeft: 6 }}>← you</span>}
+                  </div>
+                  <div style={{ fontSize: 10, color: "#7a6e8e" }}>🔥 {entry.streak} day streak</div>
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#f0e6ff", fontFamily: "var(--font-mono)" }}>{entry.saved}</div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
         {/* Challenge */}
         <motion.div {...fade(0.24)} style={{ marginBottom: 24 }}>
           <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.14em", color: "#7a6e8e", fontWeight: 600, marginBottom: 12 }}>Active Challenge</div>
-          <div style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.1),rgba(232,121,249,0.05))", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 16, padding: 16, boxShadow: "0 0 40px -16px rgba(168,85,247,0.4)" }}>
+          <div className="interactive-card breathing-glow" style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.1),rgba(232,121,249,0.05))", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 16, padding: 16 }}>
             <h2 style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 22, color: "#f0e6ff", marginBottom: 6 }}>Save $200 before Spring Finals</h2>
             <p style={{ fontSize: 11, color: "#7a6e8e", marginBottom: 4, fontWeight: 500 }}>14 of 52 joined · Pool $1,840 / $4,000</p>
             <p style={{ fontSize: 11, color: "#7a6e8e", marginBottom: 14, fontWeight: 500 }}>Deadline: May 15, 2026</p>
@@ -137,6 +251,7 @@ export default function CohortPage() {
 
             {!joined ? (
               <button onClick={() => { setJoined(true); setChallengeOpen(true); }}
+                className="transition-transform duration-200 active:scale-[0.98]"
                 style={{ width: "100%", padding: 14, borderRadius: 14, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 14, fontWeight: 700, border: "none", cursor: "pointer", boxShadow: "0 0 20px rgba(168,85,247,0.4)" }}>
                 Join the Challenge
               </button>
@@ -176,6 +291,7 @@ export default function CohortPage() {
                   )}
                 </AnimatePresence>
                 <button onClick={logWin}
+                  className="transition-transform duration-200 active:scale-[0.98]"
                   style={{ width: "100%", padding: 14, borderRadius: 14, background: "linear-gradient(135deg,#a855f7,#e879f9)", color: "#fff", fontSize: 14, fontWeight: 700, border: "none", cursor: "pointer" }}>
                   Log a Win Today
                 </button>
